@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, Hash, MessageCircle, Phone, Volume2, Play, RefreshCw, Info } from 'lucide-react';
+import { Mail, MessageSquare, Hash, MessageCircle, Phone, Volume2, Info, CheckCheck } from 'lucide-react';
+import ToneDropdown, { usePreviewTone } from './ToneDropdown';
+import { DEFAULT_TONE } from '../data/tones';
 import './NotificationSettings.css';
 
 // Channels — order matters
@@ -54,8 +56,6 @@ const SPECIFIC = {
   ],
 };
 
-const TONES = ['Chime', 'Ping', 'Knock', 'Pop', 'Ring', 'Soft'];
-const DEFAULT_TONE = { email: 'Chime', chat: 'Ping', slack: 'Knock', whatsapp: 'Pop', voice: 'Ring' };
 const DEFAULT_ON_ACTIVITIES = ['assigned', 'mention', 'sla_first', 'sla_res'];
 
 function buildInitialState() {
@@ -78,28 +78,41 @@ function buildInitialSound() {
   return sound;
 }
 
-const NotificationSettings = () => {
-  const [layout, setLayout] = useState('channel'); // 'channel' | 'activity'
+const NotificationSettings = ({ layout, setLayout }) => {
   const [soundMaster, setSoundMaster] = useState(true);
   const [sound, setSound] = useState(buildInitialSound);
+  const [bulkTone, setBulkTone] = useState(DEFAULT_TONE.email);
   const [state, setState] = useState(buildInitialState);
   const [activeTab, setActiveTab] = useState('email');
-  const [playingTone, setPlayingTone] = useState(null);
+  const { playingToneId, previewTone } = usePreviewTone();
 
   const toggleChannelSound = (channelId) => {
     setSound((prev) => ({ ...prev, [channelId]: { ...prev[channelId], on: !prev[channelId].on } }));
   };
 
-  const cycleTone = (channelId) => {
+  const setChannelTone = (channelId, toneId) => {
+    setSound((prev) => ({ ...prev, [channelId]: { ...prev[channelId], tone: toneId } }));
+  };
+
+  const applyBulkTone = (toneId) => {
+    setBulkTone(toneId);
     setSound((prev) => {
-      const i = TONES.indexOf(prev[channelId].tone);
-      return { ...prev, [channelId]: { ...prev[channelId], tone: TONES[(i + 1) % TONES.length] } };
+      const updated = {};
+      CHANNELS.forEach((c) => {
+        updated[c.id] = { ...prev[c.id], tone: toneId };
+      });
+      return updated;
     });
   };
 
-  const previewTone = (channelId) => {
-    setPlayingTone(channelId);
-    setTimeout(() => setPlayingTone((cur) => (cur === channelId ? null : cur)), 600);
+  const setActivityForAllChannels = (activityId, value) => {
+    setState((prev) => {
+      const updated = {};
+      CHANNELS.forEach((c) => {
+        updated[c.id] = { ...prev[c.id], [activityId]: value };
+      });
+      return updated;
+    });
   };
 
   const toggleActivity = (channelId, activityId) => {
@@ -139,6 +152,15 @@ const NotificationSettings = () => {
         {soundMaster && (
           <div className="sound-body">
             <div className="sound-sub">Pick which channels play a sound and choose a tone for each.</div>
+            <div className="sound-bulk-row">
+              <span className="sound-bulk-label">Use one tone everywhere</span>
+              <ToneDropdown
+                value={bulkTone}
+                onChange={applyBulkTone}
+                playingToneId={playingToneId}
+                onPreview={previewTone}
+              />
+            </div>
             {CHANNELS.map((c) => {
               const s = sound[c.id];
               return (
@@ -148,18 +170,13 @@ const NotificationSettings = () => {
                     {c.name}
                   </span>
                   <span className={`tone-controls ${s.on ? '' : 'disabled'}`}>
-                    <button
-                      className={`tone-play ${playingTone === c.id ? 'playing' : ''}`}
-                      onClick={() => previewTone(c.id)}
+                    <ToneDropdown
+                      value={s.tone}
+                      onChange={(toneId) => setChannelTone(c.id, toneId)}
                       disabled={!s.on}
-                      aria-label={`Preview ${c.name} tone`}
-                    >
-                      <Play size={11} fill="currentColor" />
-                    </button>
-                    <button className="tone-btn" onClick={() => cycleTone(c.id)} disabled={!s.on}>
-                      {s.tone}
-                      <RefreshCw size={11} />
-                    </button>
+                      playingToneId={playingToneId}
+                      onPreview={previewTone}
+                    />
                   </span>
                   <button
                     className={`hs-switch ${s.on ? 'on' : ''}`}
@@ -183,24 +200,6 @@ const NotificationSettings = () => {
             <h2>Notifications</h2>
             <p>Choose what notifies you, per activity and per channel.</p>
           </div>
-          <div className="layout-switcher" role="tablist" aria-label="Notification layout">
-            <button
-              className={layout === 'channel' ? 'active' : ''}
-              onClick={() => setLayout('channel')}
-              role="tab"
-              aria-selected={layout === 'channel'}
-            >
-              By channel
-            </button>
-            <button
-              className={layout === 'activity' ? 'active' : ''}
-              onClick={() => setLayout('activity')}
-              role="tab"
-              aria-selected={layout === 'activity'}
-            >
-              By activity
-            </button>
-          </div>
         </div>
 
         {layout === 'channel' ? (
@@ -212,7 +211,11 @@ const NotificationSettings = () => {
             toggleActivity={toggleActivity}
           />
         ) : (
-          <ActivityFirst state={state} toggleActivity={toggleActivity} />
+          <ActivityFirst
+            state={state}
+            toggleActivity={toggleActivity}
+            setActivityForAllChannels={setActivityForAllChannels}
+          />
         )}
       </div>
     </div>
@@ -295,7 +298,7 @@ function ActivityRow({ label, enabled, onToggle, onlyHere }) {
   );
 }
 
-function ActivityFirst({ state, toggleActivity }) {
+function ActivityFirst({ state, toggleActivity, setActivityForAllChannels }) {
   // Trailing bucket for channel-specific activities, each only applicable to its own channel
   const specificRows = CHANNELS.flatMap((c) => (SPECIFIC[c.id] || []).map((item) => ({ ...item, ownerId: c.id })));
 
@@ -319,16 +322,31 @@ function ActivityFirst({ state, toggleActivity }) {
           {BUCKETS.map((bucket) => (
             <React.Fragment key={bucket.name}>
               <tr className="bucket-row"><td colSpan={CHANNELS.length + 1}>{bucket.name}</td></tr>
-              {bucket.items.map((item) => (
-                <tr className="item-row" key={item.id}>
-                  <td><span className="n-type">{item.label}</span></td>
-                  {CHANNELS.map((c) => (
-                    <td className="c" key={c.id}>
-                      <Checkbox checked={state[c.id][item.id]} onChange={() => toggleActivity(c.id, item.id)} />
+              {bucket.items.map((item) => {
+                const allOn = CHANNELS.every((c) => state[c.id][item.id]);
+                return (
+                  <tr className="item-row" key={item.id}>
+                    <td>
+                      <span className="n-type-row">
+                        <span className="n-type">{item.label}</span>
+                        <button
+                          type="button"
+                          className="row-all-toggle"
+                          onClick={() => setActivityForAllChannels(item.id, !allOn)}
+                        >
+                          <CheckCheck size={12} />
+                          {allOn ? 'Turn off for all' : 'Turn on for all'}
+                        </button>
+                      </span>
                     </td>
-                  ))}
-                </tr>
-              ))}
+                    {CHANNELS.map((c) => (
+                      <td className="c" key={c.id}>
+                        <Checkbox checked={state[c.id][item.id]} onChange={() => toggleActivity(c.id, item.id)} />
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </React.Fragment>
           ))}
 

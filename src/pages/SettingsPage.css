@@ -79,12 +79,20 @@
 }
 
 .settings-main-content {
+  position: relative;
   flex: 1;
   padding: 40px 60px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 32px; /* Updated from 24px to 32px */
+}
+
+.notif-layout-switcher {
+  position: absolute;
+  top: 40px;
+  right: 60px;
+  z-index: 1;
 }
 
 .content-header {

@@ -1,0 +1,96 @@
+.tone-dropdown {
+  position: relative;
+}
+
+.tone-dropdown-trigger {
+  border: 1.5px solid var(--slateBorderLight);
+  background: var(--slateSurfaceWhite);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--slateTextBody);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+.tone-dropdown-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tone-dropdown-menu {
+  z-index: 1000;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--slateSurfaceWhite);
+  border: 0.5px solid var(--slateBorderLight);
+  border-radius: 8px;
+  box-shadow: 0 8px 8px var(--slateTextCaption);
+}
+
+.tone-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.tone-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.tone-option:hover,
+.tone-option.selected {
+  background: var(--slateSurfaceSubtle);
+}
+
+.tone-option-play {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--slateTextBody);
+}
+
+.tone-option-play.playing {
+  color: var(--primarySurfaceDefault);
+}
+
+.tone-option-label {
+  flex: 1;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: var(--body-small-size);
+  color: var(--slateTextBody);
+  cursor: pointer;
+}
+
+.tone-option-check {
+  color: var(--primarySurfaceDefault);
+  flex-shrink: 0;
+}
+
+.tone-dropdown-divider {
+  height: 1px;
+  background: var(--slateBorderMild);
+  margin: 4px 8px;
+}

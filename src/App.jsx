@@ -6,6 +6,7 @@ import ConversationList from './components/ConversationList';
 import ConversationDetail from './components/ConversationDetail';
 import RightPanel from './components/RightPanel';
 import SettingsPage from './pages/SettingsPage';
+import NotifyMeAboutPage from './pages/NotifyMeAboutPage';
 import { useState } from 'react';
 
 const conversationsData = [
@@ -1009,20 +1010,21 @@ function App() {
   return (
     <div className="app-container">
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={<NotifyMeAboutPage />} />
+        <Route path="/conversations" element={
           <>
-            <Sidebar 
+            <Sidebar
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
             />
-            <ConversationList 
-              conversations={filteredConversations} 
-              selectedId={selectedId} 
-              onSelect={setSelectedId} 
+            <ConversationList
+              conversations={filteredConversations}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
               activeFilter={activeFilter}
             />
-            <ConversationDetail 
-              conversation={selectedConversation} 
+            <ConversationDetail
+              conversation={selectedConversation}
               signatures={signatures}
               setSignatures={setSignatures}
               defaultSignatureId={defaultSignatureId}
@@ -1031,7 +1033,7 @@ function App() {
           </>
         } />
         <Route path="/settings" element={
-          <SettingsPage 
+          <SettingsPage
             signatures={signatures}
             setSignatures={setSignatures}
             defaultSignatureId={defaultSignatureId}

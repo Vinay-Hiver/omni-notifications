@@ -1,5 +1,5 @@
 {
-  "name": "custom-placeholders",
+  "name": "omni-notifications",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -22,6 +22,8 @@
     "@tiptap/pm": "^3.20.2",
     "@tiptap/react": "^3.20.2",
     "@tiptap/starter-kit": "^3.20.2",
+    "@untitledui/icons": "^0.0.22",
+    "agentation": "^3.0.2",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

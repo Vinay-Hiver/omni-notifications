@@ -1,0 +1,1727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Omni Notifications — Prototype 02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-family: 'Hanken Grotesk', sans-serif;
+    --heading-h4-size: 20px;
+    --label-medium-size: 16px;
+    --label-small-size: 14px;
+    --label-xsmall-size: 12px;
+    --body-small-size: 14px;
+
+    /* Slate tokens */
+    --slateSurfaceDark500: #64758b;
+    --slateSurfaceDark600: #475569;
+    --slateSurfaceDarkest: #334155;
+    --slateSurfaceDefault: #94a3b8;
+    --slateSurfaceDisabled: #e2e8f0;
+    --slateSurfaceSubtle: #f8fafc;
+    --slateSurfaceSubtle100-hover: #f1f5f9;
+    --slateSurfaceSubtle200: #e2e8f0;
+    --slateSurfaceWhite: #ffffff;
+    --slateBorderLight: #e2e8f0;
+    --slateBorderMild: #edf1f6;
+    --slateTextBody: #334155;
+    --slateTextCaption: #cbd5e1;
+    --slateTextDisabled: #94a3b8;
+    --slateTextSubtle: #64758b;
+    --slateTextTitle: #0f172a;
+    --slateIconsActive: #334155;
+    --slateIconsDisabled: #94a3b8;
+    --slateIconsSubtle: #64758b;
+
+    /* Primary tokens */
+    --primarySurfaceDefault: #276cf0;
+    --primarySurfaceLighter: #7ea8f6;
+    --primarySurfaceSubtle: #e6effd;
+    --primaryBorderLighter: #a9c5f9;
+    --primaryBorderSubtle: #d4e2fc;
+    --primaryTextLabel: #0c3e9d;
+    --primarySurfaceHover: #0d47b5;
+
+    /* Semantic tokens */
+    --errorSurfaceDefault: #b81717;
+    --errorSurfaceDisabled: #eb5c5c;
+    --blueBorderLight: #a9c5f9;
+    --pastelLightBlueTextBody: #255c87;
+    --pastelLightBlueTextTitle: #255c87;
+    --pastelOrangeSurfaceSubtle: #fcefe8;
+    --pastelOrangeBorderDefault: #e3692c;
+    --pastelOrangeTextBody: #93370d;
+  }
+
+  * { box-sizing: border-box; }
+  button, select, input, textarea { font-family: inherit; }
+  body {
+    margin: 0;
+    font-family: var(--font-family);
+    background-color: var(--slateSurfaceWhite);
+    color: var(--slateTextBody);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .notify-page-root {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--slateSurfaceWhite);
+  }
+
+  /* ---- Mini Sidebar ---- */
+  .mini-sidebar {
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    flex: 0 0 44px;
+    background-color: var(--slateSurfaceDarkest);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 8px 12px 8px;
+    flex-shrink: 0;
+    align-items: center;
+    z-index: 10;
+  }
+  .mini-top, .mini-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+  }
+  .mini-top { gap: 10px; }
+  .logo-container {
+    width: 28px;
+    height: 44px;
+    padding: 11px 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .logo-container img { width: 28px; height: 28px; }
+  .mini-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    align-items: center;
+  }
+  .mini-item {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .mini-item img {
+    opacity: 0.65;
+    filter: brightness(0) invert(1);
+    width: 16px;
+    height: 16px;
+  }
+  .mini-item:hover {
+    background-color: var(--slateSurfaceDark600);
+  }
+  .mini-item:hover img {
+    opacity: 0.9;
+  }
+  .mini-item.active {
+    background-color: var(--slateSurfaceDark600);
+  }
+  .mini-item.active img {
+    opacity: 1;
+  }
+  .mini-item.notification-wrapper {
+    position: relative;
+  }
+  .notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background-color: #ef4444;
+    border-radius: 50%;
+  }
+  .avatar-container {
+    position: relative;
+    cursor: pointer;
+  }
+  .avatar {
+    width: 28px;
+    height: 28px;
+    background-color: #f59e0b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .status-indicator.online {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border: 1.5px solid var(--slateSurfaceDarkest);
+    border-radius: 50%;
+  }
+
+  /* Tooltip */
+  .mini-item .tooltip {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    background-color: #334155;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s, visibility 0.1s;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  .mini-item:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ---- Layout & Subnav ---- */
+  .notify-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  .notify-subnav {
+    width: 236px;
+    border-right: 1px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0 16px;
+    flex-shrink: 0;
+  }
+  .notify-subnav-header {
+    padding: 0 20px 0 24px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .notify-subnav-header h2 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--slateTextBody);
+    margin: 0;
+  }
+  .notify-subnav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 11px 0 10px;
+  }
+  .notify-subnav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--slateTextBody);
+    font-size: 14px;
+  }
+  .notify-subnav-item img {
+    opacity: 0.7;
+    width: 14px;
+    height: 14px;
+  }
+  .notify-subnav-item.active {
+    background: var(--primarySurfaceSubtle);
+    color: var(--primarySurfaceDefault);
+    font-weight: 500;
+    border-radius: 8px;
+  }
+  .notify-subnav-item.active img {
+    opacity: 1;
+  }
+
+  /* ---- Content Wrapper & Topbar ---- */
+  .notify-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+  .notify-topbar {
+    height: 60px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--slateBorderLight);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+  .notify-topbar h1 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--slateTextTitle);
+    margin: 0;
+  }
+  .proto-switcher { display: flex; border: 1px solid var(--slateBorderLight); border-radius: 6px; overflow: hidden; }
+  .proto-switcher a { font-size: 13px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
+  .proto-switcher a + a { border-left: 1px solid var(--slateBorderLight); }
+  .proto-switcher a.active { background: var(--slateSurfaceSubtle); color: var(--primarySurfaceDefault); font-weight: 700; }
+
+  /* ---- Main Content ---- */
+  .notify-main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+  .notify-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 800px;
+    max-width: 100%;
+  }
+  .notify-block h2 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--slateTextTitle);
+    margin: 0;
+  }
+  .notify-block-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .notify-block-subtext {
+    font-size: 13px;
+    color: var(--slateTextSubtle);
+    margin-top: 2px;
+    margin-bottom: 0;
+  }
+  .notify-snooze {
+    flex-shrink: 0;
+  }
+  .notify-snooze-banner {
+    background: rgba(230, 239, 253, 0.5);
+    border: 0.5px solid var(--blueBorderLight, #a9c5f9);
+    border-radius: 8px;
+    padding: 12px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .notify-snooze-banner.show {
+    display: flex;
+  }
+  .notify-snooze-banner p {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--pastelLightBlueTextBody, #255c87);
+    margin: 0;
+  }
+  .notify-snooze-resume {
+    border: none;
+    background: none;
+    padding: 4px 12px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--pastelLightBlueTextTitle, #255c87);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ---- desktop notification permission banner ---- */
+  .notify-permission-banner {
+    width: 800px;
+    max-width: 100%;
+    border-radius: 8px;
+    padding: 12px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .notify-permission-banner.show {
+    display: flex;
+  }
+  .notify-permission-banner p {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0;
+  }
+  .notify-permission-enable {
+    height: 36px;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .notify-permission-close {
+    border: none;
+    background: none;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+  .notify-permission-learn-more {
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: underline;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  /* Ask state: permission not yet decided (matches the snooze-banner blue toast) */
+  .notify-permission-banner.state-ask {
+    background: rgba(230, 239, 253, 0.5);
+    border: 0.5px solid var(--blueBorderLight, #a9c5f9);
+  }
+  .notify-permission-banner.state-ask p {
+    color: var(--pastelLightBlueTextBody, #255c87);
+  }
+  .notify-permission-banner.state-ask .notify-permission-enable {
+    background: var(--primarySurfaceDefault);
+  }
+
+  /* Denied state: warning, dismissible */
+  .notify-permission-banner.state-denied {
+    background: var(--pastelOrangeSurfaceSubtle);
+    border: 0.5px solid var(--pastelOrangeBorderDefault);
+  }
+  .notify-permission-banner.state-denied p {
+    color: var(--pastelOrangeTextBody);
+  }
+  .notify-permission-banner.state-denied .notify-permission-close {
+    color: var(--pastelOrangeTextBody);
+  }
+  .notify-permission-banner.state-denied .notify-permission-learn-more {
+    color: var(--pastelOrangeTextBody);
+  }
+
+  /* ---- Card & Rows ---- */
+  .notify-card {
+    border: 1px solid var(--slateBorderMild);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #fff;
+  }
+  .notify-divider {
+    height: 1px;
+    background: var(--slateBorderMild);
+    width: 100%;
+    flex-shrink: 0;
+  }
+  .notify-bucket {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .notify-bucket-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--slateTextTitle);
+    margin: 0;
+  }
+  .notify-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 32px;
+  }
+  .notify-row-label {
+    flex: 1;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--slateTextBody);
+  }
+  .notify-row-label-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 2px 0;
+  }
+  .notify-row-caption {
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--slateTextSubtle);
+  }
+
+  /* ---- Switches ---- */
+  .notify-switch {
+    width: 32px;
+    height: 16px;
+    background-color: var(--slateSurfaceDefault);
+    border: none;
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .notify-switch.on {
+    background-color: var(--primarySurfaceDefault);
+  }
+  .notify-switch-handle {
+    width: 12px;
+    height: 12px;
+    background: var(--slateSurfaceWhite);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.15s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .notify-switch.on .notify-switch-handle {
+    transform: translateX(16px);
+  }
+
+  /* ---- Advanced Settings Section ---- */
+  .notify-advanced-block {
+    width: 800px;
+    max-width: 100%;
+    margin-top: -24px; /* parent gap is 32px; this makes the visible gap 8px */
+  }
+  .notify-advanced-block .notify-block-title-row {
+    align-items: center;
+  }
+  .notify-advanced-block h2 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--slateTextTitle);
+    margin: 0;
+  }
+  .notify-advanced-chevron-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .notify-advanced-chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--slateTextSubtle);
+    transition: transform 0.2s ease;
+  }
+  .notify-advanced-chevron-btn[aria-expanded="true"] .notify-advanced-chevron {
+    transform: rotate(180deg);
+  }
+  .notify-advanced-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  /* ---- notification sound (verbatim from NotifyMeAboutPage.css) ---- */
+  .notify-sound-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .notify-sound-title {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--slateTextTitle);
+    margin: 0;
+  }
+
+  .notify-sound-desc {
+    font-size: 13px;
+    color: var(--slateTextSubtle);
+    margin: 0;
+  }
+
+  .notify-sound-card {
+    background: var(--slateSurfaceWhite);
+    border: 1px solid var(--slateBorderMild);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  #soundBody { display: flex; flex-direction: column; gap: 12px; }
+
+  .notify-sound-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .notify-sound-row-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--slateTextTitle);
+  }
+
+  .notify-sound-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .notify-sound-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .notify-sound-option input[type='radio'] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primarySurfaceDefault);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .notify-sound-option-label {
+    flex: 1;
+    font-size: 14px;
+    color: var(--slateTextBody);
+  }
+
+  .notify-sound-divider {
+    height: 1px;
+    background: var(--slateBorderMild);
+    width: 100%;
+  }
+
+  .notify-sound-channel-list {
+    display: flex;
+    flex-direction: column;
+    padding-left: 26px;
+  }
+
+  .notify-sound-channel-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+  }
+
+  /* ---- Dropdowns ---- */
+  .tone-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .tone-dropdown-trigger {
+    border: 1.5px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--slateTextBody);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 130px;
+    white-space: nowrap;
+  }
+  .tone-dropdown-trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .tone-dropdown-menu {
+    z-index: 1000;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--slateSurfaceWhite);
+    border: 0.5px solid var(--slateBorderLight);
+    border-radius: 8px;
+    box-shadow: 0 8px 8px var(--slateTextCaption);
+  }
+  .tone-dropdown-list {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+  }
+  .tone-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+  }
+  .tone-option:hover,
+  .tone-option.selected {
+    background: var(--slateSurfaceSubtle);
+  }
+  .tone-option-play {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--slateTextBody);
+  }
+  .tone-option-play.playing {
+    color: var(--primarySurfaceDefault);
+  }
+  .tone-option-label {
+    flex: 1;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 0;
+    font-family: var(--font-family);
+    font-size: var(--body-small-size);
+    color: var(--slateTextBody);
+    cursor: pointer;
+  }
+  .tone-option-check {
+    color: var(--primarySurfaceDefault);
+    flex-shrink: 0;
+  }
+  .tone-dropdown-divider {
+    height: 1px;
+    background: var(--slateBorderMild);
+    margin: 4px 8px;
+  }
+
+  /* ---- Footer ---- */
+  .notify-footer {
+    width: 100%;
+    padding: 16px 20px;
+    border-top: 1px solid var(--slateBorderLight);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+    background: #fff;
+  }
+  .notify-btn-secondary {
+    padding: 8px 16px;
+    border: 1px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    color: var(--slateTextBody);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .notify-btn-secondary:disabled {
+    cursor: not-allowed;
+    color: var(--slateTextDisabled);
+    border-color: var(--slateBorderLight);
+  }
+  .notify-btn-save {
+    padding: 8px 16px;
+    border: none;
+    background: var(--primarySurfaceDefault);
+    color: var(--slateSurfaceWhite);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .notify-btn-save:disabled {
+    cursor: not-allowed;
+    background: var(--slateSurfaceDisabled);
+    color: var(--slateTextDisabled);
+  }
+
+  /* ---- Modal ---- */
+  .notify-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+  .notify-modal-overlay.show {
+    display: flex;
+  }
+  .notify-modal {
+    width: 480px;
+    max-width: calc(100vw - 40px);
+    background: var(--slateSurfaceSubtle);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .notify-modal-header {
+    height: 48px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .notify-modal-title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--slateTextBody);
+    margin: 0;
+  }
+  .notify-modal-close {
+    border: none;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--slateTextSubtle);
+    padding: 4px;
+  }
+  .notify-modal-body {
+    background: #ffffff;
+    border: 1px solid var(--slateBorderLight);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .notify-modal-text {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--slateTextBody);
+    margin: 0;
+  }
+  .notify-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+  .notify-modal-cancel {
+    height: 36px;
+    padding: 4px 12px;
+    border: 1px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    color: var(--slateTextBody);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .notify-modal-confirm {
+    height: 36px;
+    padding: 4px 12px;
+    border: none;
+    background: var(--errorSurfaceDefault);
+    color: var(--slateSurfaceWhite);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="notify-page-root">
+  <!-- Mini Sidebar -->
+  <div class="mini-sidebar">
+    <div class="mini-top">
+      <div class="logo-container" onclick="location.href='/'">
+        <img src="/src/assets/icons/hiver-logo.svg" alt="Hiver" />
+      </div>
+      <div class="mini-nav">
+        <div class="mini-item" onclick="location.href='/conversations'">
+          <img src="/src/assets/icons/inboxes.svg" alt="Inboxes" />
+          <span class="tooltip">Conversations</span>
+        </div>
+        <div class="mini-item notification-wrapper">
+          <img src="/src/assets/icons/notification.svg" alt="Notifications" />
+          <div class="notification-dot"></div>
+          <span class="tooltip">Notifications</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/templates.svg" alt="Templates" />
+          <span class="tooltip">Templates</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/customers.svg" alt="Customers" />
+          <span class="tooltip">Customers</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/analytics.svg" alt="Analytics" />
+          <span class="tooltip">Analytics</span>
+        </div>
+        <div class="mini-item active">
+          <img src="/src/assets/icons/settings.svg" alt="Settings" />
+          <span class="tooltip">Settings</span>
+        </div>
+      </div>
+    </div>
+    <div class="mini-bottom">
+      <div class="mini-item">
+        <img src="/src/assets/icons/help.svg" alt="Help" />
+      </div>
+      <div class="mini-item">
+        <img src="/src/assets/icons/chat-support.svg" alt="Support" />
+      </div>
+      <div class="avatar-container">
+        <div class="avatar">A</div>
+        <div class="status-indicator online"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout & Subnav -->
+  <div class="notify-layout">
+    <aside class="notify-subnav">
+      <div class="notify-subnav-header">
+        <h2>My Settings</h2>
+      </div>
+      <div class="notify-subnav-items">
+        <div class="notify-subnav-item">
+          <img src="/src/assets/icons/inbox-icon.svg" alt="" />
+          <span>Profile</span>
+        </div>
+        <div class="notify-subnav-item">
+          <img src="/src/assets/icons/settings.svg" alt="" />
+          <span>Basic Settings</span>
+        </div>
+        <div class="notify-subnav-item">
+          <img src="/src/assets/icons/new-conversation.svg" alt="" />
+          <span>Sender Settings</span>
+        </div>
+        <div class="notify-subnav-item active">
+          <img src="/src/assets/icons/notification.svg" alt="" />
+          <span>Notifications Settings</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="notify-content-wrapper">
+      <header class="notify-topbar">
+        <h1>Notification settings</h1>
+        <div class="proto-switcher">
+          <a href="01.html">Option 1</a>
+          <a href="02.html" class="active">Option 2</a>
+          <a href="03.html">Option 3</a>
+        </div>
+      </header>
+
+      <main class="notify-main-content">
+        <div class="notify-permission-banner" id="permissionBanner">
+          <p id="permissionBannerText">Enable desktop notifications to get notified the moment something needs your attention.</p>
+          <a href="#" class="notify-permission-learn-more" id="permissionLearnMoreLink" style="display: none;">Learn more</a>
+          <button class="notify-permission-enable" id="permissionEnableBtn">Enable desktop notifications</button>
+          <button class="notify-permission-close" id="permissionCloseBtn" aria-label="Dismiss" style="display: none;">&times;</button>
+        </div>
+
+        <!-- Basic settings block: flat list of the 8 most important notifications -->
+        <div class="notify-block">
+          <div class="notify-block-title-row">
+            <div>
+              <h2>Basic settings</h2>
+              <p class="notify-block-subtext">These settings apply across all channels</p>
+            </div>
+            <div class="notify-snooze" id="snoozeDropdownSlot"></div>
+          </div>
+
+          <div class="notify-snooze-banner" id="snoozeBanner">
+            <p>Notifications paused until <strong id="snoozeUntilText"></strong></p>
+            <button class="notify-snooze-resume" id="resumeBtn">Resume now</button>
+          </div>
+
+          <!-- Basic notifications card -->
+          <div class="notify-card" id="bucketsCard"></div>
+        </div>
+
+        <!-- Advanced settings block (Separate section outside the basic box) -->
+        <div class="notify-card notify-advanced-block" id="advHeader" style="cursor: pointer;">
+          <div class="notify-block-title-row">
+            <div>
+              <h2>Advanced settings</h2>
+              <p class="notify-block-subtext">Less-common activity updates and channel-specific alerts</p>
+            </div>
+            <button class="notify-advanced-chevron-btn" type="button" aria-expanded="false" id="advToggleBtn">
+              <svg class="notify-advanced-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+
+          <!-- Advanced notifications content (nested inside this same card) -->
+          <div class="notify-advanced-content" id="advancedCard" style="display: none;"></div>
+        </div>
+
+        <!-- Notification sound block -->
+        <div class="notify-block">
+          <header class="notify-sound-header">
+            <p class="notify-sound-title">Notification sound</p>
+            <p class="notify-sound-desc" id="soundDesc">Choose the sound that plays when a notification arrives</p>
+          </header>
+
+          <div class="notify-sound-card">
+            <div class="notify-sound-row">
+              <span class="notify-sound-row-label">Play sound for notifications</span>
+              <button class="notify-switch on" id="soundOnSwitch" role="switch" aria-checked="true">
+                <span class="notify-switch-handle"></span>
+              </button>
+            </div>
+
+            <div id="soundBody">
+              <div class="notify-sound-divider"></div>
+              <div class="notify-sound-options-group">
+                <label class="notify-sound-option">
+                  <input type="radio" name="soundMode" id="soundModeSingle" checked>
+                  <span class="notify-sound-option-label">Apply a single sound to all notifications</span>
+                  <div id="bulkToneSlot"></div>
+                </label>
+
+                <label class="notify-sound-option">
+                  <input type="radio" name="soundMode" id="soundModePerChannel">
+                  <span class="notify-sound-option-label">Configure notification sounds by channel</span>
+                </label>
+
+                <div class="notify-sound-channel-list" id="channelToneList" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="notify-footer">
+        <button class="notify-btn-secondary" id="restoreBtn" disabled>Restore defaults</button>
+        <button class="notify-btn-save" id="saveBtn" disabled>Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Restore Confirmation Modal -->
+  <div class="notify-modal-overlay" id="modalOverlay">
+    <div class="notify-modal">
+      <div class="notify-modal-header">
+        <p class="notify-modal-title">Restore default settings?</p>
+        <button class="notify-modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="notify-modal-body">
+        <p class="notify-modal-text">Your current notification and sound choices will be discarded and reset to the recommended defaults.</p>
+        <div class="notify-modal-actions">
+          <button class="notify-modal-cancel" id="modalCancel">Cancel</button>
+          <button class="notify-modal-confirm" id="modalConfirm">Restore defaults</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- Data Definitions ----
+const CHANNELS = [
+  { id: 'email', name: 'Email' },
+  { id: 'chat', name: 'Chat' },
+  { id: 'slack', name: 'Slack' },
+  { id: 'sms', name: 'SMS' },
+  { id: 'voice', name: 'Voice' },
+  { id: 'whatsapp', name: 'WhatsApp' },
+];
+const CHANNEL_NAME = Object.fromEntries(CHANNELS.map(c => [c.id, c.name]));
+
+// Primary: the 8 most important notifications, shown as one flat list, no categorization.
+const PRIMARY_ITEMS = [
+  { id: 'assigned', label: 'A conversation is assigned to me' },
+  { id: 'reply_mine', label: 'A new reply on a conversation assigned to me' },
+  { id: 'mention', label: 'Someone @mentions me in a note' },
+  { id: 'new_convo', label: 'A new conversation comes in', caption: "Real-time Chat, Slack, SMS or WhatsApp notifications won't show in the notification panel" },
+  { id: 'sla_first', label: 'First-response SLA is about to breach' },
+  { id: 'sla_res', label: 'Resolution SLA is breached' },
+  { id: 'reopened', label: 'A conversation is reopened' },
+  { id: 'delivery_failed', label: 'Message delivery fails', caption: 'Only for SMS, WhatsApp and Voice' },
+];
+
+// Advanced: Secondary event notifications & channel-specific alerts (same categorization as before)
+const ADVANCED_BUCKETS = [
+  {
+    id: 'conversation_updates',
+    name: 'Conversation updates',
+    items: [
+      { id: 'followed', label: 'A conversation I follow is updated' },
+      { id: 'reassigned', label: 'A conversation is reassigned away from me' },
+      { id: 'cust_reply', label: 'A customer replies' },
+      { id: 'merged', label: 'A conversation is merged into another' },
+    ],
+  },
+  {
+    id: 'resolution_feedback',
+    name: 'Resolution & feedback',
+    items: [
+      { id: 'resolved', label: 'A conversation is marked resolved' },
+      { id: 'csat', label: 'CSAT feedback is received' },
+      { id: 'auto_closed', label: 'A conversation is auto-closed due to inactivity' },
+    ],
+  },
+  {
+    id: 'message_activity',
+    name: 'Message activity',
+    items: [
+      { id: 'reaction_added', label: 'Someone reacts to your message', caption: 'Only for Slack, Chat and WhatsApp' },
+      { id: 'window_closing', label: 'Reply window is about to close', caption: 'Only for WhatsApp and SMS' },
+      { id: 'missed_call', label: 'You missed a call', caption: 'Only for Voice' },
+      { id: 'email_bounce', label: 'An email bounces or fails to deliver', caption: 'Only for Email' },
+    ],
+  },
+];
+
+const ALL_BUCKETS = [{ id: 'primary_flat', name: '', items: PRIMARY_ITEMS }, ...ADVANCED_BUCKETS];
+
+const DEFAULT_OFF = new Set(['reassigned', 'cust_reply', 'csat', 'resolved', 'reaction_added', 'merged', 'auto_closed']);
+
+const SNOOZE_OPTIONS = [
+  { id: '30m', label: 'For 30 minutes', ms: 30 * 60 * 1000 },
+  { id: '1h', label: 'For 1 hour', ms: 60 * 60 * 1000 },
+  { id: '2h', label: 'For 2 hours', ms: 120 * 60 * 1000 },
+];
+
+const TONES = [
+  { id: 'chime', name: 'Chime', file: '/src/tones/chime.mp3' },
+  { id: 'bling', name: 'Bling', file: '/src/tones/bling.mp3' },
+  { id: 'ring', name: 'Ring', file: '/src/tones/ring.mp3' },
+  { id: 'notification', name: 'Notification', file: '/src/tones/notification.mp3' },
+  { id: 'droplet', name: 'Droplet', file: '/src/tones/droplet.mp3' },
+  { id: 'twinkle', name: 'Twinkle', file: '/src/tones/twinkle.mp3' },
+  { id: 'horn', name: 'Horn', file: '/src/tones/horn.mp3' },
+  { id: 'bark', name: 'Bark', file: '/src/tones/bark.mp3' },
+  { id: 'meow', name: 'Meow', file: '/src/tones/meow.mp3' },
+];
+const TONE_MAP = Object.fromEntries(TONES.map(t => [t.id, t]));
+const DEFAULT_TONE = {
+  email: 'chime',
+  chat: 'notification',
+  slack: 'bling',
+  sms: 'twinkle',
+  voice: 'ring',
+  whatsapp: 'droplet',
+};
+
+// ---- State ----
+function buildDefaults() {
+  const enabled = {};
+  ALL_BUCKETS.forEach(b => b.items.forEach(item => { enabled[item.id] = !DEFAULT_OFF.has(item.id); }));
+  return enabled;
+}
+
+const state = {
+  enabled: buildDefaults(),
+  advancedOpen: false,
+  soundOn: true,
+  soundMode: 'single',
+  bulkTone: DEFAULT_TONE.email,
+  channelTones: { ...DEFAULT_TONE },
+  isDirty: false,
+  snoozeUntil: null,
+};
+
+function markDirty() {
+  state.isDirty = true;
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('restoreBtn').disabled = false;
+}
+
+// ---- Audio Preview ----
+let playingToneId = null;
+let previewAudio = null;
+const tonePlayButtons = new Set();
+
+function previewTone(toneId) {
+  const tone = TONE_MAP[toneId];
+  if (!tone) return;
+  if (previewAudio) previewAudio.pause();
+  const audio = new Audio(tone.file);
+  previewAudio = audio;
+  playingToneId = toneId;
+  tonePlayButtons.forEach(fn => fn());
+  const clear = () => {
+    if (playingToneId === toneId) {
+      playingToneId = null;
+      tonePlayButtons.forEach(fn => fn());
+    }
+  };
+  audio.addEventListener('ended', clear);
+  audio.play().catch(clear);
+}
+
+// ---- Tone Dropdown Component ----
+function createToneDropdown({ value, disabled, onChange }) {
+  let currentValue = value;
+  let isDisabled = disabled;
+
+  const root = document.createElement('div');
+  root.className = 'tone-dropdown';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'tone-dropdown-trigger';
+  trigger.disabled = isDisabled;
+
+  const triggerLabel = document.createElement('span');
+  const chevron = document.createElement('span');
+  chevron.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  trigger.appendChild(triggerLabel);
+  trigger.appendChild(chevron);
+
+  const menu = document.createElement('div');
+  menu.className = 'tone-dropdown-menu';
+
+  function updateTriggerText() {
+    const t = TONE_MAP[currentValue];
+    triggerLabel.textContent = currentValue === 'none' ? 'No sound' : t ? t.name : 'Select tone';
+  }
+  updateTriggerText();
+
+  function renderOptions() {
+    menu.innerHTML = '';
+    const list = document.createElement('div');
+    list.className = 'tone-dropdown-list';
+
+    TONES.forEach(tone => {
+      const opt = document.createElement('div');
+      opt.className = `tone-option ${currentValue === tone.id ? 'selected' : ''}`;
+
+      const playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.className = 'tone-option-play';
+      const updatePlayIcon = () => {
+        playBtn.classList.toggle('playing', playingToneId === tone.id);
+        playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>`;
+      };
+      updatePlayIcon();
+      tonePlayButtons.add(updatePlayIcon);
+
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        previewTone(tone.id);
+      });
+
+      const label = document.createElement('button');
+      label.type = 'button';
+      label.className = 'tone-option-label';
+      label.textContent = tone.name;
+      label.addEventListener('click', () => {
+        currentValue = tone.id;
+        updateTriggerText();
+        renderOptions();
+        closeMenu();
+        onChange(tone.id);
+      });
+
+      opt.appendChild(playBtn);
+      opt.appendChild(label);
+      if (currentValue === tone.id) {
+        const check = document.createElement('span');
+        check.className = 'tone-option-check';
+        check.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        opt.appendChild(check);
+      }
+      list.appendChild(opt);
+    });
+
+    const divider = document.createElement('div');
+    divider.className = 'tone-dropdown-divider';
+    list.appendChild(divider);
+
+    // No sound option
+    const noOpt = document.createElement('div');
+    noOpt.className = `tone-option ${currentValue === 'none' ? 'selected' : ''}`;
+    const noLabel = document.createElement('button');
+    noLabel.type = 'button';
+    noLabel.className = 'tone-option-label';
+    noLabel.textContent = 'No sound';
+    noLabel.addEventListener('click', () => {
+      currentValue = 'none';
+      updateTriggerText();
+      renderOptions();
+      closeMenu();
+      onChange('none');
+    });
+    noOpt.appendChild(noLabel);
+    if (currentValue === 'none') {
+      const check = document.createElement('span');
+      check.className = 'tone-option-check';
+      check.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      noOpt.appendChild(check);
+    }
+    list.appendChild(noOpt);
+    menu.appendChild(list);
+  }
+  renderOptions();
+
+  function positionMenu() {
+    const rect = trigger.getBoundingClientRect();
+    const menuWidth = 220;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUpward = spaceBelow < 320 && rect.top > spaceBelow;
+    menu.style.position = 'fixed';
+    menu.style.width = menuWidth + 'px';
+    menu.style.left = Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8) + 'px';
+    if (openUpward) { menu.style.bottom = (window.innerHeight - rect.top + 6) + 'px'; menu.style.top = ''; }
+    else { menu.style.top = (rect.bottom + 6) + 'px'; menu.style.bottom = ''; }
+  }
+
+  function openMenu() {
+    renderOptions();
+    positionMenu();
+    document.body.appendChild(menu);
+  }
+  function closeMenu() {
+    if (menu.parentNode) menu.parentNode.removeChild(menu);
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (trigger.disabled) return;
+    const isOpen = !!menu.parentNode;
+    closeAllMenus();
+    if (!isOpen) openMenu();
+  });
+
+  root.appendChild(trigger);
+
+  return {
+    el: root,
+    setValue: (val) => { currentValue = val; updateTriggerText(); renderOptions(); },
+    setDisabled: (dis) => { isDisabled = dis; trigger.disabled = dis; },
+  };
+}
+
+// ---- Snooze Dropdown Component ----
+function renderSnoozeDropdown() {
+  const slot = document.getElementById('snoozeDropdownSlot');
+  slot.innerHTML = '';
+  if (state.snoozeUntil) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'tone-dropdown';
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'tone-dropdown-trigger';
+  trigger.innerHTML = `<span>Pause notifications</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  const menu = document.createElement('div');
+  menu.className = 'tone-dropdown-menu';
+  const list = document.createElement('div');
+  list.className = 'tone-dropdown-list';
+  menu.appendChild(list);
+  SNOOZE_OPTIONS.forEach(opt => {
+    const item = document.createElement('div');
+    item.className = 'tone-option';
+    item.innerHTML = `<span style="font-size:14px;color:var(--slateTextBody);">${opt.label}</span>`;
+    item.addEventListener('click', () => {
+      state.snoozeUntil = new Date(Date.now() + opt.ms);
+      closeAllMenus();
+      updateSnoozeUI();
+    });
+    list.appendChild(item);
+  });
+
+  function positionMenu() {
+    const rect = trigger.getBoundingClientRect();
+    const menuWidth = 220;
+    menu.style.position = 'fixed';
+    menu.style.width = menuWidth + 'px';
+    menu.style.left = Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8) + 'px';
+    menu.style.top = (rect.bottom + 6) + 'px';
+    menu.style.bottom = '';
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !!menu.parentNode;
+    closeAllMenus();
+    if (!isOpen) { positionMenu(); document.body.appendChild(menu); }
+  });
+
+  wrap.appendChild(trigger);
+  slot.appendChild(wrap);
+}
+
+function updateSnoozeUI() {
+  const banner = document.getElementById('snoozeBanner');
+  if (state.snoozeUntil) {
+    banner.classList.add('show');
+    document.getElementById('snoozeUntilText').textContent =
+      state.snoozeUntil.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+  } else {
+    banner.classList.remove('show');
+  }
+  renderSnoozeDropdown();
+}
+
+document.getElementById('resumeBtn').addEventListener('click', () => {
+  state.snoozeUntil = null;
+  updateSnoozeUI();
+});
+
+function closeAllMenus() {
+  document.querySelectorAll('body > .tone-dropdown-menu').forEach(m => m.parentNode.removeChild(m));
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.tone-dropdown') || e.target.closest('.tone-dropdown-menu')) return;
+  closeAllMenus();
+});
+
+// ---- Render Buckets Card ----
+
+function updateAdvancedToggleUI() {
+  const advCard = document.getElementById('advancedCard');
+  const advToggleBtn = document.getElementById('advToggleBtn');
+  if (!advCard || !advToggleBtn) return;
+
+  if (state.advancedOpen) {
+    advCard.style.display = 'flex';
+    advToggleBtn.setAttribute('aria-expanded', 'true');
+  } else {
+    advCard.style.display = 'none';
+    advToggleBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function renderBucketsCard() {
+  // 1. Basic notifications card: one flat list, no categorization
+  const basicCard = document.getElementById('bucketsCard');
+  basicCard.innerHTML = '';
+
+  const bucketDiv = document.createElement('div');
+  bucketDiv.className = 'notify-bucket';
+  PRIMARY_ITEMS.forEach(item => {
+    bucketDiv.appendChild(createActivityRow(item, false));
+  });
+  basicCard.appendChild(bucketDiv);
+
+  // 2. Advanced notifications content, nested inside the same card as the header
+  const advCard = document.getElementById('advancedCard');
+  advCard.innerHTML = '';
+
+  ADVANCED_BUCKETS.forEach((bucket) => {
+    const div = document.createElement('div');
+    div.className = 'notify-divider';
+    advCard.appendChild(div);
+
+    const bucketDiv = document.createElement('div');
+    bucketDiv.className = 'notify-bucket';
+
+    const title = document.createElement('p');
+    title.className = 'notify-bucket-title';
+    title.textContent = bucket.name;
+    bucketDiv.appendChild(title);
+
+    bucket.items.forEach(item => {
+      bucketDiv.appendChild(createActivityRow(item, true));
+    });
+
+    advCard.appendChild(bucketDiv);
+  });
+
+  updateAdvancedToggleUI();
+}
+
+function createActivityRow(item, isAdvanced = false) {
+  const row = document.createElement('div');
+  row.className = 'notify-row';
+
+  if (item.caption) {
+    const group = document.createElement('span');
+    group.className = 'notify-row-label-group';
+    const label = document.createElement('span');
+    label.className = 'notify-row-label';
+    label.textContent = item.label;
+    const caption = document.createElement('span');
+    caption.className = 'notify-row-caption';
+    caption.textContent = item.caption;
+    group.appendChild(label);
+    group.appendChild(caption);
+    row.appendChild(group);
+  } else {
+    const label = document.createElement('span');
+    label.className = 'notify-row-label';
+    label.textContent = item.label;
+    row.appendChild(label);
+  }
+
+  const sw = document.createElement('button');
+  sw.className = `notify-switch ${state.enabled[item.id] ? 'on' : ''}`;
+  sw.role = 'switch';
+  sw.setAttribute('aria-checked', state.enabled[item.id]);
+  sw.innerHTML = '<span class="notify-switch-handle"></span>';
+  sw.addEventListener('click', () => {
+    state.enabled[item.id] = !state.enabled[item.id];
+    sw.classList.toggle('on', state.enabled[item.id]);
+    sw.setAttribute('aria-checked', state.enabled[item.id]);
+    markDirty();
+  });
+
+  row.appendChild(sw);
+  return row;
+}
+
+// ---- Sound Section Setup ----
+const soundOnSwitch = document.getElementById('soundOnSwitch');
+soundOnSwitch.addEventListener('click', () => {
+  state.soundOn = !state.soundOn;
+  soundOnSwitch.classList.toggle('on', state.soundOn);
+  soundOnSwitch.setAttribute('aria-checked', state.soundOn);
+  document.getElementById('soundBody').style.display = state.soundOn ? 'flex' : 'none';
+  markDirty();
+});
+
+const soundDesc = document.getElementById('soundDesc');
+const soundModeSingle = document.getElementById('soundModeSingle');
+const soundModePerChannel = document.getElementById('soundModePerChannel');
+const channelToneList = document.getElementById('channelToneList');
+
+const bulkToneDropdown = createToneDropdown({
+  value: state.bulkTone,
+  disabled: false,
+  onChange: (id) => { state.bulkTone = id; markDirty(); },
+});
+document.getElementById('bulkToneSlot').appendChild(bulkToneDropdown.el);
+
+const channelToneDropdowns = {};
+function renderChannelTones() {
+  channelToneList.innerHTML = '';
+  CHANNELS.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'notify-sound-channel-row';
+    const label = document.createElement('span');
+    label.className = 'notify-sound-row-label';
+    label.textContent = c.name;
+    const dropdown = createToneDropdown({
+      value: state.channelTones[c.id],
+      disabled: false,
+      onChange: (id) => { state.channelTones[c.id] = id; markDirty(); },
+    });
+    channelToneDropdowns[c.id] = dropdown;
+    row.appendChild(label);
+    row.appendChild(dropdown.el);
+    channelToneList.appendChild(row);
+  });
+}
+renderChannelTones();
+
+function updateSoundMode() {
+  const perChannel = soundModePerChannel.checked;
+  state.soundMode = perChannel ? 'perChannel' : 'single';
+  bulkToneDropdown.setDisabled(perChannel);
+  channelToneList.style.display = perChannel ? 'flex' : 'none';
+}
+soundModeSingle.addEventListener('change', () => { updateSoundMode(); markDirty(); });
+soundModePerChannel.addEventListener('change', () => { updateSoundMode(); markDirty(); });
+
+// ---- Restore Defaults Modal ----
+const modalOverlay = document.getElementById('modalOverlay');
+document.getElementById('restoreBtn').addEventListener('click', () => {
+  if (document.getElementById('restoreBtn').disabled) return;
+  modalOverlay.classList.add('show');
+});
+function closeModal() { modalOverlay.classList.remove('show'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+document.getElementById('modalConfirm').addEventListener('click', () => {
+  state.enabled = buildDefaults();
+  state.advancedOpen = false;
+  state.soundOn = true;
+  soundOnSwitch.classList.add('on');
+  soundOnSwitch.setAttribute('aria-checked', true);
+  document.getElementById('soundBody').style.display = 'flex';
+
+  state.soundMode = 'single';
+  soundModeSingle.checked = true;
+  soundModePerChannel.checked = false;
+
+  state.bulkTone = DEFAULT_TONE.email;
+  bulkToneDropdown.setValue(state.bulkTone);
+
+  CHANNELS.forEach(c => {
+    state.channelTones[c.id] = DEFAULT_TONE[c.id];
+    if (channelToneDropdowns[c.id]) channelToneDropdowns[c.id].setValue(state.channelTones[c.id]);
+  });
+  updateSoundMode();
+
+  renderBucketsCard();
+  state.isDirty = false;
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('restoreBtn').disabled = true;
+  closeModal();
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  state.isDirty = false;
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('restoreBtn').disabled = true;
+});
+
+// ---- Advanced Settings Toggle ----
+const advToggleBtn = document.getElementById('advToggleBtn');
+const advHeader = document.getElementById('advHeader');
+function toggleAdvanced() {
+  state.advancedOpen = !state.advancedOpen;
+  updateAdvancedToggleUI();
+}
+if (advToggleBtn) {
+  advToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleAdvanced();
+  });
+}
+if (advHeader) {
+  advHeader.addEventListener('click', toggleAdvanced);
+}
+
+// ---- Desktop notification permission banner ----
+// First-time gate: nothing on this page can actually reach the user as a
+// desktop notification until the browser permission itself is granted.
+let permissionBannerDismissed = false;
+
+function updatePermissionBanner() {
+  const banner = document.getElementById('permissionBanner');
+  const text = document.getElementById('permissionBannerText');
+  const enableBtn = document.getElementById('permissionEnableBtn');
+  const closeBtn = document.getElementById('permissionCloseBtn');
+  const learnMoreLink = document.getElementById('permissionLearnMoreLink');
+  if (!banner || !('Notification' in window)) return;
+
+  const permission = Notification.permission; // 'default' | 'granted' | 'denied'
+
+  if (permission === 'granted' || permissionBannerDismissed) {
+    banner.classList.remove('show');
+    return;
+  }
+
+  banner.classList.add('show');
+  if (permission === 'denied') {
+    // Denied: warning message, no Enable button (browsers won't re-prompt once denied), dismissible.
+    banner.classList.remove('state-ask');
+    banner.classList.add('state-denied');
+    text.textContent = 'Desktop notifications are blocked. Enable them in your browser settings.';
+    enableBtn.style.display = 'none';
+    learnMoreLink.style.display = '';
+    closeBtn.style.display = '';
+  } else {
+    // First-time (default): the ask, not dismissible until they act on it.
+    banner.classList.remove('state-denied');
+    banner.classList.add('state-ask');
+    text.textContent = 'Get notified even when the Hiver tab isn\'t open.';
+    enableBtn.style.display = '';
+    learnMoreLink.style.display = 'none';
+    closeBtn.style.display = 'none';
+  }
+}
+
+const permissionEnableBtn = document.getElementById('permissionEnableBtn');
+if (permissionEnableBtn && 'Notification' in window) {
+  permissionEnableBtn.addEventListener('click', async () => {
+    await Notification.requestPermission();
+    updatePermissionBanner();
+  });
+}
+
+const permissionCloseBtn = document.getElementById('permissionCloseBtn');
+if (permissionCloseBtn) {
+  permissionCloseBtn.addEventListener('click', () => {
+    permissionBannerDismissed = true;
+    updatePermissionBanner();
+  });
+}
+
+// ---- Initialize ----
+renderBucketsCard();
+renderSnoozeDropdown();
+updateSoundMode();
+updatePermissionBanner();
+</script>
+
+<div id="agentation-root"></div>
+<script type="module">
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import { Agentation } from 'agentation';
+
+  const container = document.getElementById('agentation-root');
+  if (container) {
+    ReactDOM.createRoot(container).render(React.createElement(Agentation));
+  }
+</script>
+</body>
+</html>

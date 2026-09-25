@@ -12,6 +12,7 @@ const SettingsPage = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [activeSection, setActiveSection] = useState('compose'); // 'compose' | 'notifications'
+  const [notifLayout, setNotifLayout] = useState('channel'); // 'channel' | 'activity'
 
   return (
     <div className="settings-page-root">
@@ -49,6 +50,26 @@ const SettingsPage = () => {
 
         <div className="settings-content-wrapper">
           <main className="settings-main-content">
+            {activeSection === 'notifications' && (
+              <div className="layout-switcher notif-layout-switcher" role="tablist" aria-label="Notification layout">
+                <button
+                  className={notifLayout === 'channel' ? 'active' : ''}
+                  onClick={() => setNotifLayout('channel')}
+                  role="tab"
+                  aria-selected={notifLayout === 'channel'}
+                >
+                  By channel
+                </button>
+                <button
+                  className={notifLayout === 'activity' ? 'active' : ''}
+                  onClick={() => setNotifLayout('activity')}
+                  role="tab"
+                  aria-selected={notifLayout === 'activity'}
+                >
+                  By activity
+                </button>
+              </div>
+            )}
             {activeSection === 'compose' ? (
               <>
                 <header className="content-header">
@@ -68,7 +89,7 @@ const SettingsPage = () => {
                 </section>
               </>
             ) : (
-              <NotificationSettings />
+              <NotificationSettings layout={notifLayout} setLayout={setNotifLayout} />
             )}
           </main>
 

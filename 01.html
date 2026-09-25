@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Notification settings — per-row channel select</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --slateSurfaceWhite: #ffffff;
+    --slateSurfaceSubtle: #f8fafc;
+    --slateSurfaceDefault: #94a3b8;
+    --slateSurfaceDisabled: #e2e8f0;
+    --slateBorderLight: #e2e8f0;
+    --slateBorderMild: #edf1f6;
+    --slateTextTitle: #0f172a;
+    --slateTextBody: #334155;
+    --slateTextSubtle: #64758b;
+    --slateTextDisabled: #94a3b8;
+    --primarySurfaceDefault: #276cf0;
+    --primaryTextLabel: #0c3e9d;
+    --errorSurfaceDefault: #b81717;
+    --blueBorderLight: #a9c5f9;
+    --pastelLightBlueTextBody: #255c87;
+    --pastelOrangeSurfaceSubtle: #fcefe8;
+    --pastelOrangeBorderDefault: #e3692c;
+    --pastelOrangeTextBody: #93370d;
+    --slateSurfaceDark600: #475569;
+    --slateSurfaceDarkest: #334155;
+    --primarySurfaceSubtle: #e6effd;
+    --slateTextCaption: #cbd5e1;
+    --body-small-size: 14px;
+    --font-family: 'Hanken Grotesk', sans-serif;
+    font-family: 'Hanken Grotesk', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  button, select, input, textarea { font-family: inherit; }
+  body { margin: 0; background: var(--slateSurfaceWhite); color: var(--slateTextBody); }
+
+  .page { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+  /* ---- Mini Sidebar (ported verbatim from 02.html) ---- */
+  .mini-sidebar { width: 44px; min-width: 44px; max-width: 44px; flex: 0 0 44px; background-color: var(--slateSurfaceDarkest); display: flex; flex-direction: column; justify-content: space-between; padding: 0 8px 12px 8px; flex-shrink: 0; align-items: center; z-index: 10; }
+  .mini-top, .mini-bottom { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; }
+  .mini-top { gap: 10px; }
+  .logo-container { width: 28px; height: 44px; padding: 11px 0 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .logo-container img { width: 28px; height: 28px; }
+  .mini-nav { display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; }
+  .mini-item { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; position: relative; cursor: pointer; transition: background-color 0.2s; }
+  .mini-item img { opacity: 0.65; filter: brightness(0) invert(1); width: 16px; height: 16px; }
+  .mini-item:hover { background-color: var(--slateSurfaceDark600); }
+  .mini-item:hover img { opacity: 0.9; }
+  .mini-item.active { background-color: var(--slateSurfaceDark600); }
+  .mini-item.active img { opacity: 1; }
+  .mini-item.notification-wrapper { position: relative; }
+  .notification-dot { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; }
+  .avatar-container { position: relative; cursor: pointer; }
+  .avatar { width: 28px; height: 28px; background-color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; }
+  .status-indicator.online { position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; background-color: #10b981; border: 1.5px solid var(--slateSurfaceDarkest); border-radius: 50%; }
+  .mini-item .tooltip { position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 10px; background-color: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 400; white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s; pointer-events: none; z-index: 1000; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+  .mini-item:hover .tooltip { opacity: 1; visibility: visible; }
+
+  .subnav { width: 236px; border-right: 1px solid var(--slateBorderLight); background: var(--slateSurfaceWhite); display: flex; flex-direction: column; padding: 15px 0 16px; flex-shrink: 0; }
+  .subnav-header { padding: 0 20px 0 24px; height: 44px; display: flex; align-items: center; }
+  .subnav h2 { font-size: 18px; font-weight: 500; line-height: 28px; margin: 0; color: var(--slateTextBody); }
+  .subnav-items { display: flex; flex-direction: column; gap: 4px; padding: 12px 11px 0 10px; }
+  .subnav-item { display: flex; align-items: center; gap: 8px; height: 32px; padding: 9px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; color: var(--slateTextBody); }
+  .subnav-item img { opacity: 0.7; width: 14px; height: 14px; }
+  .subnav-item.active { background: var(--primarySurfaceSubtle); color: var(--primarySurfaceDefault); font-weight: 500; border-radius: 8px; }
+  .subnav-item.active img { opacity: 1; }
+
+  .content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+  .topbar { height: 60px; flex-shrink: 0; border-bottom: 1px solid var(--slateBorderLight); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .topbar h1 { font-size: 16px; font-weight: 500; margin: 0; color: var(--slateTextTitle); }
+  .proto-switcher { display: flex; border: 1px solid var(--slateBorderLight); border-radius: 6px; overflow: hidden; }
+  .proto-switcher a { font-size: 13px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
+  .proto-switcher a + a { border-left: 1px solid var(--slateBorderLight); }
+  .proto-switcher a.active { background: var(--slateSurfaceSubtle); color: var(--primarySurfaceDefault); font-weight: 700; }
+
+  .main { flex: 1; overflow-y: auto; padding: 40px 60px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .block { display: flex; flex-direction: column; gap: 12px; width: 900px; max-width: 100%; }
+
+  .title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .title-row h2 { font-size: 18px; font-weight: 500; margin: 0; color: var(--slateTextTitle); }
+  .subtext { font-size: 13px; color: var(--slateTextSubtle); margin: 2px 0 0; }
+
+  /* ---- per-section container (new) ---- */
+  .section-card { border: 1px solid var(--slateBorderMild); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--slateTextTitle); margin: 0; }
+  .section-rows { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 32px; padding: 0; }
+  .row + .row { border-top: 1px solid var(--slateBorderMild); padding-top: 10px; }
+  .row-label-group { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 2px 0; }
+  .row-label { font-size: 14px; color: var(--slateTextTitle); }
+  .row-caption { font-size: 12px; color: var(--slateTextSubtle); }
+  .row-controls { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+
+  /* ---- channel multi-select dropdown ---- */
+  .chan-dropdown { position: relative; }
+  .chan-trigger {
+    border: 1.5px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 14px;
+    color: var(--slateTextBody);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 140px;
+    white-space: nowrap;
+  }
+  .chan-trigger[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .chan-trigger svg { flex-shrink: 0; }
+  .chan-menu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+    width: 220px; background: var(--slateSurfaceWhite);
+    border: 0.5px solid var(--slateBorderLight); border-radius: 8px;
+    box-shadow: 0 8px 8px rgba(203,213,225,0.6);
+    padding: 4px; display: none; flex-direction: column;
+  }
+  .chan-menu.open { display: flex; }
+  .chan-option { display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 8px; cursor: pointer; }
+  .chan-option:hover { background: var(--slateSurfaceSubtle); }
+  .chan-option input { width: 16px; height: 16px; accent-color: var(--primarySurfaceDefault); cursor: pointer; }
+  .chan-option span { font-size: 14px; color: var(--slateTextBody); }
+  .chan-menu-divider { height: 1px; background: var(--slateBorderMild); margin: 4px 8px; }
+
+  /* ---- switch ---- */
+  .switch { width: 32px; height: 16px; background: var(--slateSurfaceDefault); border: none; border-radius: 8px; position: relative; cursor: pointer; flex-shrink: 0; padding: 0; transition: background-color .15s; }
+  .switch.on { background: var(--primarySurfaceDefault); }
+  .switch-handle { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .switch.on .switch-handle { transform: translateX(16px); }
+
+  /* ---- snooze ---- */
+  .snooze-banner { background: rgba(230,239,253,.5); border: .5px solid var(--blueBorderLight); border-radius: 8px; padding: 12px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
+  .snooze-banner.show { display: flex; }
+  .snooze-banner p { flex: 1; min-width: 0; margin: 0; font-size: 14px; color: var(--pastelLightBlueTextBody); }
+  .snooze-resume { border: none; background: none; padding: 4px 12px; font-size: 14px; font-weight: 500; color: var(--pastelLightBlueTextBody); cursor: pointer; }
+
+  /* ---- desktop notification permission banner ---- */
+  .permission-banner { width: 900px; max-width: 100%; border-radius: 8px; padding: 12px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
+  .permission-banner.show { display: flex; }
+  .permission-banner p { flex: 1; min-width: 0; font-size: 14px; line-height: 20px; margin: 0; }
+  .permission-enable { height: 36px; padding: 8px 20px; border: none; border-radius: 6px; font-family: var(--font-family); font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+  .permission-close { border: none; background: none; font-size: 18px; line-height: 1; cursor: pointer; padding: 4px; flex-shrink: 0; }
+  .permission-learn-more { font-size: 14px; font-weight: 500; text-decoration: underline; white-space: nowrap; flex-shrink: 0; }
+  .permission-banner.state-ask { background: rgba(230, 239, 253, 0.5); border: 0.5px solid var(--blueBorderLight); }
+  .permission-banner.state-ask p { color: var(--pastelLightBlueTextBody); }
+  .permission-banner.state-ask .permission-enable { background: var(--primarySurfaceDefault); }
+  .permission-banner.state-denied { background: var(--pastelOrangeSurfaceSubtle); border: 0.5px solid var(--pastelOrangeBorderDefault); }
+  .permission-banner.state-denied p { color: var(--pastelOrangeTextBody); }
+  .permission-banner.state-denied .permission-close { color: var(--pastelOrangeTextBody); }
+  .permission-banner.state-denied .permission-learn-more { color: var(--pastelOrangeTextBody); }
+
+  /* ---- sound card (ported verbatim from src/pages/NotifyMeAboutPage.css) ---- */
+  .sound-card { background: var(--slateSurfaceWhite); border: 1px solid var(--slateBorderMild); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  #soundBody { display: flex; flex-direction: column; gap: 12px; }
+  .sound-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .sound-row-label { font-size: 14px; font-weight: 500; color: var(--slateTextTitle); }
+  .sound-divider { height: 1px; background: var(--slateBorderMild); width: 100%; }
+  .sound-options { display: flex; flex-direction: column; gap: 12px; }
+  .sound-option { display: flex; align-items: center; gap: 6px; }
+  .sound-option input[type=radio] { width: 18px; height: 18px; margin: 0; accent-color: var(--primarySurfaceDefault); cursor: pointer; flex-shrink: 0; }
+  .sound-option-label { flex: 1; font-size: 14px; color: var(--slateTextBody); }
+  .channel-tone-list { display: flex; flex-direction: column; padding-left: 26px; }
+  .channel-tone-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
+
+  /* ---- tone dropdown (ported verbatim from src/components/ToneDropdown.css) ---- */
+  .tone-dropdown { position: relative; }
+  .tone-dropdown-trigger {
+    border: 1.5px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--slateTextBody);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 130px;
+    white-space: nowrap;
+  }
+  .tone-dropdown-trigger:disabled { cursor: not-allowed; opacity: 0.5; }
+  .tone-dropdown-menu {
+    z-index: 1000; max-height: 320px; overflow-y: auto;
+    background: var(--slateSurfaceWhite);
+    border: 0.5px solid var(--slateBorderLight);
+    border-radius: 8px;
+    box-shadow: 0 8px 8px var(--slateTextCaption);
+  }
+  .tone-dropdown-list { display: flex; flex-direction: column; padding: 4px; }
+  .tone-option { display: flex; align-items: center; gap: 12px; border-radius: 8px; padding: 8px; }
+  .tone-option:hover, .tone-option.selected { background: var(--slateSurfaceSubtle); }
+  .tone-option-play {
+    width: 24px; height: 24px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+    border: none; background: none; padding: 0; cursor: pointer; color: var(--slateTextBody);
+  }
+  .tone-option-play.playing { color: var(--primarySurfaceDefault); }
+  .tone-option-label {
+    flex: 1; text-align: left; border: none; background: none; padding: 0;
+    font-family: var(--font-family); font-size: var(--body-small-size); color: var(--slateTextBody); cursor: pointer;
+  }
+  .tone-option-check { color: var(--primarySurfaceDefault); flex-shrink: 0; }
+  .tone-dropdown-divider { height: 1px; background: var(--slateBorderMild); margin: 4px 8px; }
+
+  /* ---- footer ---- */
+  .footer { width: 100%; padding: 16px 20px; border-top: 1px solid var(--slateBorderLight); display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0; background: #fff; }
+  .btn { padding: 8px 16px; border-radius: 6px; font-family: var(--font-family); font-size: 14px; font-weight: 500; cursor: pointer; }
+  .btn-secondary { border: 1px solid var(--slateBorderLight); background: var(--slateSurfaceWhite); color: var(--slateTextBody); }
+  .btn-secondary[disabled] { cursor: not-allowed; color: var(--slateTextDisabled); border-color: var(--slateBorderLight); }
+  .btn-primary { border: none; background: var(--primarySurfaceDefault); color: var(--slateSurfaceWhite); }
+  .btn-primary[disabled] { cursor: not-allowed; background: var(--slateSurfaceDisabled); color: var(--slateTextDisabled); }
+
+  /* ---- modal ---- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.4); display: none; align-items: center; justify-content: center; z-index: 100; }
+  .modal-overlay.show { display: flex; }
+  .modal { width: 480px; max-width: calc(100vw - 40px); background: var(--slateSurfaceSubtle); border-radius: 12px; overflow: hidden; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+  .modal-header p { margin: 0; font-size: 16px; font-weight: 500; color: var(--slateTextBody); }
+  .modal-close { border: none; background: none; font-size: 18px; color: var(--slateTextSubtle); cursor: pointer; }
+  .modal-body { background: #fff; border: 1px solid var(--slateBorderLight); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+  .modal-body p { margin: 0; font-size: 14px; color: var(--slateTextBody); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 16px; }
+  .modal-confirm { height: 36px; padding: 4px 12px; border: none; background: var(--errorSurfaceDefault); border-radius: 6px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; }
+  .modal-cancel { height: 36px; padding: 4px 12px; border: 1px solid var(--slateBorderLight); background: #fff; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--slateTextBody); cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="mini-sidebar">
+    <div class="mini-top">
+      <div class="logo-container" onclick="location.href='/'">
+        <img src="/src/assets/icons/hiver-logo.svg" alt="Hiver" />
+      </div>
+      <div class="mini-nav">
+        <div class="mini-item" onclick="location.href='/conversations'">
+          <img src="/src/assets/icons/inboxes.svg" alt="Inboxes" />
+          <span class="tooltip">Conversations</span>
+        </div>
+        <div class="mini-item notification-wrapper">
+          <img src="/src/assets/icons/notification.svg" alt="Notifications" />
+          <div class="notification-dot"></div>
+          <span class="tooltip">Notifications</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/templates.svg" alt="Templates" />
+          <span class="tooltip">Templates</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/customers.svg" alt="Customers" />
+          <span class="tooltip">Customers</span>
+        </div>
+        <div class="mini-item">
+          <img src="/src/assets/icons/analytics.svg" alt="Analytics" />
+          <span class="tooltip">Analytics</span>
+        </div>
+        <div class="mini-item active">
+          <img src="/src/assets/icons/settings.svg" alt="Settings" />
+          <span class="tooltip">Settings</span>
+        </div>
+      </div>
+    </div>
+    <div class="mini-bottom">
+      <div class="mini-item">
+        <img src="/src/assets/icons/help.svg" alt="Help" />
+      </div>
+      <div class="mini-item">
+        <img src="/src/assets/icons/chat-support.svg" alt="Support" />
+      </div>
+      <div class="avatar-container">
+        <div class="avatar">A</div>
+        <div class="status-indicator online"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="subnav">
+    <div class="subnav-header">
+      <h2>My Settings</h2>
+    </div>
+    <div class="subnav-items">
+      <div class="subnav-item">
+        <img src="/src/assets/icons/inbox-icon.svg" alt="" />
+        <span>Profile</span>
+      </div>
+      <div class="subnav-item">
+        <img src="/src/assets/icons/settings.svg" alt="" />
+        <span>Basic Settings</span>
+      </div>
+      <div class="subnav-item">
+        <img src="/src/assets/icons/new-conversation.svg" alt="" />
+        <span>Sender Settings</span>
+      </div>
+      <div class="subnav-item active">
+        <img src="/src/assets/icons/notification.svg" alt="" />
+        <span>Notifications Settings</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <h1>Notification settings</h1>
+      <div class="proto-switcher">
+        <a href="01.html" class="active">Option 1</a>
+        <a href="02.html">Option 2</a>
+        <a href="03.html">Option 3</a>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="permission-banner" id="permissionBanner">
+        <p id="permissionBannerText">Enable desktop notifications to get notified the moment something needs your attention.</p>
+        <a href="#" class="permission-learn-more" id="permissionLearnMoreLink" style="display: none;">Learn more</a>
+        <button class="permission-enable" id="permissionEnableBtn">Enable desktop notifications</button>
+        <button class="permission-close" id="permissionCloseBtn" aria-label="Dismiss" style="display: none;">&times;</button>
+      </div>
+
+      <div class="block">
+        <div class="title-row">
+          <div>
+            <h2>Customize notifications</h2>
+            <p class="subtext">These settings are applicable across all channels</p>
+          </div>
+          <div id="snoozeDropdownSlot"></div>
+        </div>
+
+        <div class="snooze-banner" id="snoozeBanner">
+          <p>Notifications paused until <strong id="snoozeUntilText"></strong></p>
+          <button class="snooze-resume" id="resumeBtn">Resume now</button>
+        </div>
+
+        <div id="sections"></div>
+      </div>
+
+      <div class="block">
+        <header>
+          <p class="section-title" style="font-size:18px;">Notification sound</p>
+          <p class="subtext" id="soundDesc">Use a single sound for all notifications</p>
+        </header>
+        <div class="sound-card">
+          <div class="sound-row">
+            <span class="sound-row-label">Play sound for notifications</span>
+            <button class="switch on" id="soundOnSwitch">
+              <span class="switch-handle"></span>
+            </button>
+          </div>
+          <div id="soundBody">
+            <div class="sound-divider"></div>
+            <div class="sound-options">
+              <label class="sound-option">
+                <input type="radio" name="soundMode" id="soundModeSingle" checked>
+                <span class="sound-option-label">Apply a single sound to all notifications</span>
+                <div id="bulkToneSlot"></div>
+              </label>
+              <label class="sound-option">
+                <input type="radio" name="soundMode" id="soundModePerChannel">
+                <span class="sound-option-label">Configure notification sounds by channel</span>
+              </label>
+              <div class="channel-tone-list" id="channelToneList" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <button class="btn btn-secondary" id="restoreBtn" disabled>Restore defaults</button>
+      <button class="btn btn-primary" id="saveBtn" disabled>Save</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <p>Restore default settings?</p>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Your current notification and sound choices will be discarded and reset to the recommended defaults.</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="modalCancel">Cancel</button>
+        <button class="modal-confirm" id="modalConfirm">Restore defaults</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- data (mirrors src/data/notificationEvents.js) ----
+const CHANNELS = [
+  { id: 'email', name: 'Email' },
+  { id: 'chat', name: 'Chat' },
+  { id: 'slack', name: 'Slack' },
+  { id: 'sms', name: 'SMS' },
+  { id: 'voice', name: 'Voice' },
+  { id: 'whatsapp', name: 'WhatsApp' },
+];
+const ALL_CHANNEL_IDS = CHANNELS.map(c => c.id);
+const CHANNEL_NAME = Object.fromEntries(CHANNELS.map(c => [c.id, c.name]));
+
+const BUCKETS = [
+  { id: 'assigned_to_me', name: 'Assigned to me', items: [
+    { id: 'assigned', label: 'A conversation is assigned to me' },
+    { id: 'reply_mine', label: 'A new reply on a conversation assigned to me' },
+    { id: 'mention', label: 'Someone @mentions me in a note' },
+    { id: 'reassigned', label: 'A conversation is reassigned away from me' },
+  ]},
+  { id: 'new_activity', name: 'New activity', items: [
+    { id: 'new_convo', label: 'A new conversation comes in', caption: "Not shown in notification panel for Chat, Slack, SMS or WhatsApp" },
+    { id: 'reopened', label: 'A conversation is reopened' },
+    { id: 'followed', label: 'A conversation I follow is updated' },
+    { id: 'cust_reply', label: 'A customer replies' },
+  ]},
+  { id: 'deadlines_feedback', name: 'Deadlines & feedback', items: [
+    { id: 'sla_first', label: 'First-response SLA is about to breach' },
+    { id: 'sla_res', label: 'Resolution SLA is breached' },
+    { id: 'csat', label: 'CSAT feedback is received' },
+    { id: 'resolved', label: 'A conversation is marked resolved' },
+  ]},
+];
+
+const CHANNEL_SPECIFIC_ACTIVITIES = [
+  { id: 'reaction_added', label: 'Someone reacts to your message', channels: ['slack', 'chat', 'whatsapp'] },
+  { id: 'delivery_failed', label: 'Message delivery fails', channels: ['sms', 'whatsapp', 'voice'] },
+  { id: 'window_closing', label: 'Reply window is about to close', channels: ['whatsapp', 'sms'] },
+];
+
+const DEFAULT_OFF = new Set(['reassigned', 'cust_reply', 'csat', 'resolved', 'reaction_added']);
+
+const SNOOZE_OPTIONS = [
+  { id: '30m', label: 'For 30 minutes', ms: 30 * 60 * 1000 },
+  { id: '1h', label: 'For 1 hour', ms: 60 * 60 * 1000 },
+  { id: '2h', label: 'For 2 hours', ms: 120 * 60 * 1000 },
+];
+
+// ---- state ----
+const state = { enabled: {}, channelSel: {}, isDirty: false, snoozeUntil: null };
+
+function allActivities() {
+  return [...BUCKETS.flatMap(b => b.items), ...CHANNEL_SPECIFIC_ACTIVITIES];
+}
+
+function buildDefaults() {
+  const enabled = {}; const channelSel = {};
+  BUCKETS.forEach(b => b.items.forEach(item => { enabled[item.id] = !DEFAULT_OFF.has(item.id); channelSel[item.id] = [...ALL_CHANNEL_IDS]; }));
+  CHANNEL_SPECIFIC_ACTIVITIES.forEach(a => { enabled[a.id] = !DEFAULT_OFF.has(a.id); channelSel[a.id] = [...a.channels]; });
+  return { enabled, channelSel };
+}
+
+function markDirty() {
+  state.isDirty = true;
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('restoreBtn').disabled = false;
+}
+
+function channelLabel(activityId) {
+  const activity = allActivities().find(a => a.id === activityId);
+  const options = activity.channels || ALL_CHANNEL_IDS;
+  const sel = state.channelSel[activityId];
+  if (sel.length === options.length) return 'All channels';
+  if (sel.length === 0) return 'No channels';
+  const names = ALL_CHANNEL_IDS.filter(id => sel.includes(id)).map(id => CHANNEL_NAME[id]);
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+function closeAllChanMenus(except) {
+  document.querySelectorAll('.chan-menu.open').forEach(m => { if (m !== except) m.classList.remove('open'); });
+}
+
+function renderChannelDropdown(activityId, enabledNow) {
+  const activity = allActivities().find(a => a.id === activityId);
+  const options = activity.channels || ALL_CHANNEL_IDS;
+  const wrap = document.createElement('div');
+  wrap.className = 'chan-dropdown';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'chan-trigger';
+  trigger.disabled = !enabledNow;
+  trigger.innerHTML = `<span class="chan-trigger-label"></span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  const menu = document.createElement('div');
+  menu.className = 'chan-menu';
+
+  function refreshLabel() { trigger.querySelector('.chan-trigger-label').textContent = channelLabel(activityId); }
+  refreshLabel();
+
+  // "All channels" master checkbox
+  const allOpt = document.createElement('label');
+  allOpt.className = 'chan-option';
+  const allBox = document.createElement('input');
+  allBox.type = 'checkbox';
+  const allSpan = document.createElement('span');
+  allSpan.textContent = 'All channels';
+  allOpt.appendChild(allBox); allOpt.appendChild(allSpan);
+  menu.appendChild(allOpt);
+
+  const divider = document.createElement('div');
+  divider.className = 'chan-menu-divider';
+  menu.appendChild(divider);
+
+  const boxes = {};
+
+  function refreshAllBox() {
+    const selCount = state.channelSel[activityId].length;
+    allBox.checked = selCount === options.length;
+    allBox.indeterminate = selCount > 0 && selCount < options.length;
+  }
+  refreshAllBox();
+
+  allBox.addEventListener('change', () => {
+    state.channelSel[activityId] = allBox.checked ? [...options] : [];
+    options.forEach(chId => { boxes[chId].checked = allBox.checked; });
+    allBox.indeterminate = false;
+    refreshLabel();
+    markDirty();
+  });
+
+  options.forEach(chId => {
+    const opt = document.createElement('label');
+    opt.className = 'chan-option';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = state.channelSel[activityId].includes(chId);
+    boxes[chId] = box;
+    box.addEventListener('change', () => {
+      const cur = new Set(state.channelSel[activityId]);
+      if (box.checked) cur.add(chId); else cur.delete(chId);
+      state.channelSel[activityId] = options.filter(id => cur.has(id));
+      refreshAllBox();
+      refreshLabel();
+      markDirty();
+    });
+    const span = document.createElement('span');
+    span.textContent = CHANNEL_NAME[chId];
+    opt.appendChild(box); opt.appendChild(span);
+    menu.appendChild(opt);
+  });
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (trigger.disabled) return;
+    const isOpen = menu.classList.contains('open');
+    closeAllChanMenus();
+    if (!isOpen) menu.classList.add('open');
+  });
+
+  wrap.appendChild(trigger); wrap.appendChild(menu);
+  wrap._refresh = () => { trigger.disabled = !state.enabled[activityId]; refreshLabel(); };
+  return wrap;
+}
+
+function onlyForLabel(channelIds) {
+  const names = channelIds.map(id => CHANNEL_NAME[id]);
+  if (names.length === 1) return `Only for ${names[0]}`;
+  return `Only for ${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+function renderRow(activity) {
+  const row = document.createElement('div');
+  row.className = 'row';
+
+  const caption = activity.caption || (activity.channels ? onlyForLabel(activity.channels) : null);
+
+  const labelGroup = document.createElement('div');
+  labelGroup.className = 'row-label-group';
+  const label = document.createElement('span');
+  label.className = 'row-label';
+  label.textContent = activity.label;
+  labelGroup.appendChild(label);
+  if (caption) {
+    const cap = document.createElement('span');
+    cap.className = 'row-caption';
+    cap.textContent = caption;
+    labelGroup.appendChild(cap);
+  }
+
+  const controls = document.createElement('div');
+  controls.className = 'row-controls';
+  const chanDropdown = renderChannelDropdown(activity.id, state.enabled[activity.id]);
+  const sw = document.createElement('button');
+  sw.className = `switch ${state.enabled[activity.id] ? 'on' : ''}`;
+  sw.innerHTML = '<span class="switch-handle"></span>';
+  sw.addEventListener('click', () => {
+    state.enabled[activity.id] = !state.enabled[activity.id];
+    sw.classList.toggle('on', state.enabled[activity.id]);
+    chanDropdown._refresh();
+    markDirty();
+  });
+
+  controls.appendChild(chanDropdown);
+  controls.appendChild(sw);
+  row.appendChild(labelGroup);
+  row.appendChild(controls);
+  return row;
+}
+
+function renderSections() {
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.gap = '20px';
+
+  BUCKETS.forEach(bucket => {
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    const title = document.createElement('p');
+    title.className = 'section-title';
+    title.textContent = bucket.name;
+    const rows = document.createElement('div');
+    rows.className = 'section-rows';
+    bucket.items.forEach(item => rows.appendChild(renderRow(item)));
+    if (bucket.id === 'deadlines_feedback') {
+      CHANNEL_SPECIFIC_ACTIVITIES.forEach(a => rows.appendChild(renderRow(a)));
+    }
+    card.appendChild(title); card.appendChild(rows);
+    container.appendChild(card);
+  });
+}
+
+// ---- snooze dropdown (reuses tone-dropdown-like trigger) ----
+function renderSnoozeDropdown() {
+  const slot = document.getElementById('snoozeDropdownSlot');
+  slot.innerHTML = '';
+  if (state.snoozeUntil) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chan-dropdown';
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'chan-trigger';
+  trigger.innerHTML = `<span>Pause notifications</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  const menu = document.createElement('div');
+  menu.className = 'chan-menu';
+  SNOOZE_OPTIONS.forEach(opt => {
+    const item = document.createElement('div');
+    item.className = 'chan-option';
+    item.style.cursor = 'pointer';
+    item.innerHTML = `<span>${opt.label}</span>`;
+    item.addEventListener('click', () => {
+      state.snoozeUntil = new Date(Date.now() + opt.ms);
+      updateSnoozeUI();
+    });
+    menu.appendChild(item);
+  });
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    closeAllChanMenus();
+    if (!isOpen) menu.classList.add('open');
+  });
+  wrap.appendChild(trigger); wrap.appendChild(menu);
+  slot.appendChild(wrap);
+}
+
+function updateSnoozeUI() {
+  const banner = document.getElementById('snoozeBanner');
+  if (state.snoozeUntil) {
+    banner.classList.add('show');
+    document.getElementById('snoozeUntilText').textContent =
+      state.snoozeUntil.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+  } else {
+    banner.classList.remove('show');
+  }
+  renderSnoozeDropdown();
+}
+
+document.getElementById('resumeBtn').addEventListener('click', () => {
+  state.snoozeUntil = null;
+  updateSnoozeUI();
+});
+
+// ---- sound section ----
+// ---- tones (ported verbatim from src/data/tones.js) ----
+const TONES = [
+  { id: 'chime', name: 'Chime', file: 'src/tones/chime.mp3' },
+  { id: 'bling', name: 'Bling', file: 'src/tones/bling.mp3' },
+  { id: 'ring', name: 'Ring', file: 'src/tones/ring.mp3' },
+  { id: 'notification', name: 'Notification', file: 'src/tones/notification.mp3' },
+  { id: 'droplet', name: 'Droplet', file: 'src/tones/droplet.mp3' },
+  { id: 'twinkle', name: 'Twinkle', file: 'src/tones/twinkle.mp3' },
+  { id: 'horn', name: 'Horn', file: 'src/tones/horn.mp3' },
+  { id: 'bark', name: 'Bark', file: 'src/tones/bark.mp3' },
+  { id: 'meow', name: 'Meow', file: 'src/tones/meow.mp3' },
+];
+const TONE_MAP = Object.fromEntries(TONES.map(t => [t.id, t]));
+const DEFAULT_TONE = { email: 'chime', chat: 'notification', slack: 'bling', sms: 'twinkle', voice: 'ring', whatsapp: 'droplet' };
+
+let playingToneId = null;
+let previewAudio = null;
+const tonePlayButtons = new Set();
+
+function previewTone(toneId) {
+  const tone = TONE_MAP[toneId];
+  if (!tone) return;
+  if (previewAudio) previewAudio.pause();
+  const audio = new Audio(tone.file);
+  previewAudio = audio;
+  playingToneId = toneId;
+  tonePlayButtons.forEach(fn => fn());
+  const clear = () => { if (playingToneId === toneId) { playingToneId = null; tonePlayButtons.forEach(fn => fn()); } };
+  audio.addEventListener('ended', clear);
+  audio.play().catch(clear);
+}
+
+// ---- ToneDropdown (ported verbatim from src/components/ToneDropdown.jsx) ----
+function createToneDropdown({ value, disabled, onChange }) {
+  const root = document.createElement('div');
+  root.className = 'tone-dropdown';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'tone-dropdown-trigger';
+  trigger.innerHTML = `<span class="tone-trigger-label"></span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  const menu = document.createElement('div');
+  menu.className = 'tone-dropdown-menu';
+  menu.setAttribute('role', 'listbox');
+  const list = document.createElement('div');
+  list.className = 'tone-dropdown-list';
+  menu.appendChild(list);
+
+  let currentValue = value;
+  let currentDisabled = disabled;
+  let open = false;
+
+  function refreshTrigger() {
+    trigger.disabled = currentDisabled;
+    trigger.querySelector('.tone-trigger-label').textContent =
+      currentValue === 'none' ? 'No sound' : (TONE_MAP[currentValue] ? TONE_MAP[currentValue].name : 'Select tone');
+  }
+
+  function playIconSvg() {
+    return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"></polygon></svg>`;
+  }
+
+  function renderList() {
+    list.innerHTML = '';
+    const rows = [];
+
+    TONES.forEach(tone => {
+      const opt = document.createElement('div');
+      opt.className = `tone-option ${currentValue === tone.id ? 'selected' : ''}`;
+      opt.setAttribute('role', 'option');
+
+      const playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.className = `tone-option-play ${playingToneId === tone.id ? 'playing' : ''}`;
+      playBtn.innerHTML = playIconSvg();
+      playBtn.setAttribute('aria-label', `Preview ${tone.name}`);
+      playBtn.addEventListener('click', (e) => { e.stopPropagation(); previewTone(tone.id); });
+
+      const labelBtn = document.createElement('button');
+      labelBtn.type = 'button';
+      labelBtn.className = 'tone-option-label';
+      labelBtn.textContent = tone.name;
+      labelBtn.addEventListener('click', () => {
+        currentValue = tone.id;
+        onChange(tone.id);
+        closeMenu();
+        refreshTrigger();
+        renderList();
+      });
+
+      opt.appendChild(playBtn); opt.appendChild(labelBtn);
+      if (currentValue === tone.id) {
+        const check = document.createElement('span');
+        check.className = 'tone-option-check';
+        check.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        opt.appendChild(check);
+      }
+      list.appendChild(opt);
+      rows.push(() => {
+        playBtn.className = `tone-option-play ${playingToneId === tone.id ? 'playing' : ''}`;
+      });
+    });
+
+    const divider = document.createElement('div');
+    divider.className = 'tone-dropdown-divider';
+    list.appendChild(divider);
+
+    const noSoundOpt = document.createElement('div');
+    noSoundOpt.className = `tone-option ${currentValue === 'none' ? 'selected' : ''}`;
+    noSoundOpt.setAttribute('role', 'option');
+    const noSoundLabel = document.createElement('button');
+    noSoundLabel.type = 'button';
+    noSoundLabel.className = 'tone-option-label';
+    noSoundLabel.textContent = 'No sound';
+    noSoundLabel.addEventListener('click', () => {
+      currentValue = 'none';
+      onChange('none');
+      closeMenu();
+      refreshTrigger();
+      renderList();
+    });
+    noSoundOpt.appendChild(noSoundLabel);
+    if (currentValue === 'none') {
+      const check = document.createElement('span');
+      check.className = 'tone-option-check';
+      check.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      noSoundOpt.appendChild(check);
+    }
+    list.appendChild(noSoundOpt);
+
+    tonePlayButtons.add(() => rows.forEach(r => r()));
+  }
+
+  function positionMenu() {
+    const rect = trigger.getBoundingClientRect();
+    const menuWidth = 220;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUpward = spaceBelow < 320 && rect.top > spaceBelow;
+    menu.style.position = 'fixed';
+    menu.style.width = menuWidth + 'px';
+    menu.style.left = Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8) + 'px';
+    if (openUpward) { menu.style.bottom = (window.innerHeight - rect.top + 6) + 'px'; menu.style.top = ''; }
+    else { menu.style.top = (rect.bottom + 6) + 'px'; menu.style.bottom = ''; }
+  }
+
+  function openMenu() {
+    if (currentDisabled || open) return;
+    open = true;
+    renderList();
+    positionMenu();
+    document.body.appendChild(menu);
+  }
+  function closeMenu() {
+    if (!open) return;
+    open = false;
+    if (menu.parentNode) menu.parentNode.removeChild(menu);
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentDisabled) return;
+    if (open) closeMenu(); else openMenu();
+  });
+
+  document.addEventListener('mousedown', (e) => {
+    if (!open) return;
+    if (root.contains(e.target) || menu.contains(e.target)) return;
+    closeMenu();
+  });
+
+  refreshTrigger();
+  root.appendChild(trigger);
+
+  return {
+    el: root,
+    setDisabled(v) { currentDisabled = v; refreshTrigger(); },
+    setValue(v) { currentValue = v; refreshTrigger(); },
+  };
+}
+
+const soundOnSwitch = document.getElementById('soundOnSwitch');
+let soundOn = true;
+soundOnSwitch.addEventListener('click', () => {
+  soundOn = !soundOn;
+  soundOnSwitch.classList.toggle('on', soundOn);
+  document.getElementById('soundBody').style.display = soundOn ? 'block' : 'none';
+  markDirty();
+});
+
+const soundDesc = document.getElementById('soundDesc');
+const soundModeSingle = document.getElementById('soundModeSingle');
+const soundModePerChannel = document.getElementById('soundModePerChannel');
+const channelToneList = document.getElementById('channelToneList');
+
+let bulkTone = DEFAULT_TONE.email;
+const channelTones = { ...DEFAULT_TONE };
+
+const bulkToneDropdown = createToneDropdown({
+  value: bulkTone,
+  disabled: false,
+  onChange: (id) => { bulkTone = id; markDirty(); },
+});
+document.getElementById('bulkToneSlot').appendChild(bulkToneDropdown.el);
+
+const channelToneDropdowns = {};
+function renderChannelTones() {
+  channelToneList.innerHTML = '';
+  CHANNELS.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'channel-tone-row';
+    const label = document.createElement('span');
+    label.className = 'sound-row-label';
+    label.style.fontWeight = '400';
+    label.textContent = c.name;
+    const dropdown = createToneDropdown({
+      value: channelTones[c.id],
+      disabled: false,
+      onChange: (id) => { channelTones[c.id] = id; markDirty(); },
+    });
+    channelToneDropdowns[c.id] = dropdown;
+    row.appendChild(label);
+    row.appendChild(dropdown.el);
+    channelToneList.appendChild(row);
+  });
+}
+renderChannelTones();
+
+function updateSoundMode() {
+  const perChannel = soundModePerChannel.checked;
+  soundDesc.textContent = perChannel ? 'Assign a different sound to each channel' : 'Use a single sound for all notifications';
+  bulkToneDropdown.setDisabled(perChannel);
+  channelToneList.style.display = perChannel ? 'flex' : 'none';
+}
+soundModeSingle.addEventListener('change', () => { updateSoundMode(); markDirty(); });
+soundModePerChannel.addEventListener('change', () => { updateSoundMode(); markDirty(); });
+updateSoundMode();
+
+// ---- restore defaults modal ----
+document.getElementById('restoreBtn').addEventListener('click', () => {
+  if (document.getElementById('restoreBtn').disabled) return;
+  document.getElementById('modalOverlay').classList.add('show');
+});
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalConfirm').addEventListener('click', () => {
+  const defaults = buildDefaults();
+  state.enabled = defaults.enabled;
+  state.channelSel = defaults.channelSel;
+  state.isDirty = false;
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('restoreBtn').disabled = true;
+  soundOn = true; soundOnSwitch.classList.add('on');
+  document.getElementById('soundBody').style.display = 'block';
+  soundModeSingle.checked = true; soundModePerChannel.checked = false;
+  bulkTone = DEFAULT_TONE.email;
+  bulkToneDropdown.setValue(bulkTone);
+  CHANNELS.forEach(c => { channelTones[c.id] = DEFAULT_TONE[c.id]; channelToneDropdowns[c.id].setValue(channelTones[c.id]); });
+  updateSoundMode();
+  renderSections();
+  closeModal();
+});
+
+// close any open dropdown on outside click
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.chan-menu') || e.target.closest('.chan-trigger')) return;
+  closeAllChanMenus();
+});
+
+// ---- Desktop notification permission banner ----
+let permissionBannerDismissed = false;
+
+function updatePermissionBanner() {
+  const banner = document.getElementById('permissionBanner');
+  const text = document.getElementById('permissionBannerText');
+  const enableBtn = document.getElementById('permissionEnableBtn');
+  const closeBtn = document.getElementById('permissionCloseBtn');
+  const learnMoreLink = document.getElementById('permissionLearnMoreLink');
+  if (!banner || !('Notification' in window)) return;
+
+  const permission = Notification.permission; // 'default' | 'granted' | 'denied'
+
+  if (permission === 'granted' || permissionBannerDismissed) {
+    banner.classList.remove('show');
+    return;
+  }
+
+  banner.classList.add('show');
+  if (permission === 'denied') {
+    banner.classList.remove('state-ask');
+    banner.classList.add('state-denied');
+    text.textContent = 'Desktop notifications are blocked. Enable them in your browser settings.';
+    enableBtn.style.display = 'none';
+    learnMoreLink.style.display = '';
+    closeBtn.style.display = '';
+  } else {
+    banner.classList.remove('state-denied');
+    banner.classList.add('state-ask');
+    text.textContent = 'Get notified even when the Hiver tab isn\'t open.';
+    enableBtn.style.display = '';
+    learnMoreLink.style.display = 'none';
+    closeBtn.style.display = 'none';
+  }
+}
+
+const permissionEnableBtn = document.getElementById('permissionEnableBtn');
+if (permissionEnableBtn && 'Notification' in window) {
+  permissionEnableBtn.addEventListener('click', async () => {
+    await Notification.requestPermission();
+    updatePermissionBanner();
+  });
+}
+
+const permissionCloseBtn = document.getElementById('permissionCloseBtn');
+if (permissionCloseBtn) {
+  permissionCloseBtn.addEventListener('click', () => {
+    permissionBannerDismissed = true;
+    updatePermissionBanner();
+  });
+}
+
+// ---- init ----
+const defaults = buildDefaults();
+state.enabled = defaults.enabled;
+state.channelSel = defaults.channelSel;
+renderSections();
+renderSnoozeDropdown();
+updatePermissionBanner();
+</script>
+</body>
+</html>
