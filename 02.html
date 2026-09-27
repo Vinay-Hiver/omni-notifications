@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Notification settings — Basic/Advanced + channel select</title>
+<title>Notifications</title>
+<link rel="icon" type="image/png" href="/hiver-favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -136,7 +137,7 @@
   .chan-trigger:hover { border-color: var(--slateSurfaceSubtle300); }
   .row:hover .chan-trigger { border-color: var(--slateSurfaceSubtle300); }
   .chan-trigger[disabled] { opacity: 0.4; cursor: not-allowed; }
-  .snooze-trigger { background: var(--slateSurfaceSubtle100); border: none; height: 32px; }
+  .snooze-trigger { background: var(--slateSurfaceSubtle100); border: none; height: 34px; }
   .snooze-trigger:hover { background: var(--slateSurfaceSlate150); }
   .chan-trigger svg { flex-shrink: 0; }
   .chan-menu {
@@ -336,6 +337,7 @@
     <header class="topbar">
       <h1>Notification settings</h1>
       <div class="topbar-controls">
+        <span class="active-channels-label">Controls for demo:</span>
         <div class="active-channels-control">
           <span class="active-channels-label">Active channels</span>
           <div id="activeChannelsSlot"></div>
