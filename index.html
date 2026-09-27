@@ -1059,8 +1059,8 @@
         </div>
 
         <!-- Advanced settings block (Separate section outside the basic box) -->
-        <div class="notify-card notify-advanced-block" id="advHeader" style="cursor: pointer;">
-          <div class="notify-block-title-row">
+        <div class="notify-card notify-advanced-block" id="advHeader">
+          <div class="notify-block-title-row" id="advTitleRow" style="cursor: pointer;">
             <div>
               <h2>Advanced settings</h2>
               <p class="notify-block-subtext">Additional alerts for specific events</p>
@@ -1739,8 +1739,11 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 });
 
 // ---- Advanced Settings Toggle ----
+// Clicking anywhere on the card opens it while collapsed (the title row is all
+// that's visible then), but once expanded only the title row itself should
+// close it — clicks inside the expanded content must not collapse the card.
 const advToggleBtn = document.getElementById('advToggleBtn');
-const advHeader = document.getElementById('advHeader');
+const advTitleRow = document.getElementById('advTitleRow');
 function toggleAdvanced() {
   state.advancedOpen = !state.advancedOpen;
   updateAdvancedToggleUI();
@@ -1751,8 +1754,8 @@ if (advToggleBtn) {
     toggleAdvanced();
   });
 }
-if (advHeader) {
-  advHeader.addEventListener('click', toggleAdvanced);
+if (advTitleRow) {
+  advTitleRow.addEventListener('click', toggleAdvanced);
 }
 
 // ---- Desktop notification permission banner ----
