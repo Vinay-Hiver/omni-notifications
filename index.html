@@ -23,6 +23,8 @@
     --slateSurfaceDefault: #94a3b8;
     --slateSurfaceDisabled: #e2e8f0;
     --slateSurfaceSubtle: #f8fafc;
+    --slateSurfaceSubtle100: #f1f5f9;
+    --slateSurfaceSlate150: #edf1f6;
     --slateSurfaceSubtle100-hover: #f1f5f9;
     --slateSurfaceSubtle200: #e2e8f0;
     --slateSurfaceWhite: #ffffff;
@@ -169,7 +171,7 @@
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 13px;
+    font-size: 14px; line-height: 20px;
     font-weight: 600;
   }
   .status-indicator.online {
@@ -293,9 +295,45 @@
     margin: 0;
   }
   .proto-switcher { display: flex; border: 1px solid var(--slateBorderLight); border-radius: 6px; overflow: hidden; }
-  .proto-switcher a { font-size: 13px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
+  .proto-switcher a { font-size: 14px; line-height: 20px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
   .proto-switcher a + a { border-left: 1px solid var(--slateBorderLight); }
   .proto-switcher a.active { background: var(--slateSurfaceSubtle); color: var(--primarySurfaceDefault); font-weight: 700; }
+  .topbar-controls { display: flex; align-items: center; gap: 20px; }
+  .active-channels-control { display: flex; align-items: center; gap: 8px; }
+  .active-channels-label { font-size: 14px; line-height: 20px; color: var(--slateTextSubtle); white-space: nowrap; }
+
+  /* ---- channel multi-select dropdown (active channels) ---- */
+  .chan-dropdown { position: relative; }
+  .chan-trigger {
+    border: 1.5px solid var(--slateBorderLight);
+    background: var(--slateSurfaceWhite);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    color: var(--slateTextBody);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 140px;
+    white-space: nowrap;
+  }
+  .chan-trigger svg { flex-shrink: 0; }
+  .chan-menu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+    width: 220px; background: var(--slateSurfaceWhite);
+    border: 0.5px solid var(--slateBorderLight); border-radius: 8px;
+    box-shadow: 0 8px 8px rgba(203,213,225,0.6);
+    padding: 4px; display: none; flex-direction: column;
+  }
+  .chan-menu.open { display: flex; }
+  .chan-option { display: flex; align-items: center; gap: 10px; border-radius: 8px; padding: 8px; cursor: pointer; }
+  .chan-option:hover { background: var(--slateSurfaceSubtle); }
+  .chan-option input { width: 16px; height: 16px; accent-color: var(--primarySurfaceDefault); cursor: pointer; }
+  .chan-option span { font-size: 14px; color: var(--slateTextBody); }
+  .chan-menu-divider { height: 1px; background: var(--slateBorderMild); margin: 4px 8px; }
 
   /* ---- Main Content ---- */
   .notify-main-content {
@@ -315,9 +353,9 @@
     max-width: 100%;
   }
   .notify-block h2 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
-    line-height: 28px;
+    line-height: 24px;
     color: var(--slateTextTitle);
     margin: 0;
   }
@@ -328,7 +366,7 @@
     gap: 12px;
   }
   .notify-block-subtext {
-    font-size: 13px;
+    font-size: 14px; line-height: 20px;
     color: var(--slateTextSubtle);
     margin-top: 2px;
     margin-bottom: 0;
@@ -357,6 +395,7 @@
     color: var(--pastelLightBlueTextBody, #255c87);
     margin: 0;
   }
+  #snoozeUntilText { font-size: 14px; font-weight: 500; line-height: 20px; }
   .notify-snooze-resume {
     border: none;
     background: none;
@@ -467,7 +506,7 @@
   .notify-bucket {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   .notify-bucket-title {
     font-size: 14px;
@@ -583,15 +622,15 @@
   }
 
   .notify-sound-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
-    line-height: 28px;
+    line-height: 24px;
     color: var(--slateTextTitle);
     margin: 0;
   }
 
   .notify-sound-desc {
-    font-size: 13px;
+    font-size: 14px; line-height: 20px;
     color: var(--slateTextSubtle);
     margin: 0;
   }
@@ -695,6 +734,8 @@
     cursor: not-allowed;
     opacity: 0.5;
   }
+  .snooze-trigger { background: var(--slateSurfaceSubtle100); border: none; height: 32px; }
+  .snooze-trigger:hover { background: var(--slateSurfaceSlate150); }
   .tone-dropdown-menu {
     z-index: 1000;
     max-height: 320px;
@@ -975,9 +1016,16 @@
     <div class="notify-content-wrapper">
       <header class="notify-topbar">
         <h1>Notification settings</h1>
-        <div class="proto-switcher">
-          <a href="/" class="active">Option 1</a>
-          <a href="/03.html">Option 2</a>
+        <div class="topbar-controls">
+          <div class="active-channels-control">
+            <span class="active-channels-label">Active channels</span>
+            <div id="activeChannelsSlot"></div>
+          </div>
+          <div class="proto-switcher">
+            <a href="/" class="active">Option 1</a>
+            <a href="/02.html">Option 2</a>
+            <a href="/03.html">Option 3</a>
+          </div>
         </div>
       </header>
 
@@ -1013,7 +1061,7 @@
           <div class="notify-block-title-row">
             <div>
               <h2>Advanced settings</h2>
-              <p class="notify-block-subtext">Less-common activity updates and channel-specific alerts</p>
+              <p class="notify-block-subtext">Additional alerts for specific events</p>
             </div>
             <button class="notify-advanced-chevron-btn" type="button" aria-expanded="false" id="advToggleBtn">
               <svg class="notify-advanced-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -1096,17 +1144,30 @@ const CHANNELS = [
   { id: 'whatsapp', name: 'WhatsApp' },
 ];
 const CHANNEL_NAME = Object.fromEntries(CHANNELS.map(c => [c.id, c.name]));
+const ALL_CHANNEL_IDS = CHANNELS.map(c => c.id);
+
+function joinNames(ids, conjunction = 'and') {
+  const names = ids.map(id => CHANNEL_NAME[id]);
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} ${conjunction} ${names[names.length - 1]}`;
+}
 
 // Primary: the 8 most important notifications, shown as one flat list, no categorization.
 const PRIMARY_ITEMS = [
   { id: 'assigned', label: 'A conversation is assigned to me' },
   { id: 'reply_mine', label: 'A new reply on a conversation assigned to me' },
   { id: 'mention', label: 'Someone @mentions me in a note' },
-  { id: 'new_convo', label: 'A new conversation comes in', caption: "Real-time Chat, Slack, SMS or WhatsApp notifications won't show in the notification panel" },
+  {
+    id: 'new_convo', label: 'A new conversation comes in',
+    captionChannels: ['chat', 'slack', 'sms', 'whatsapp'], captionConjunction: 'or',
+    captionTemplate: (names) => `Real-time ${names} notifications won't show in the notification panel`,
+  },
   { id: 'sla_first', label: 'First-response SLA is about to breach' },
+  { id: 'sla_next', label: 'Next-response SLA is about to breach' },
   { id: 'sla_res', label: 'Resolution SLA is breached' },
   { id: 'reopened', label: 'A conversation is reopened' },
-  { id: 'delivery_failed', label: 'Message delivery fails', caption: 'Only for SMS, WhatsApp and Voice' },
+  { id: 'delivery_failed', label: 'Message delivery fails', channels: ['sms', 'whatsapp', 'voice'] },
 ];
 
 // Advanced: Secondary event notifications & channel-specific alerts (same categorization as before)
@@ -1119,6 +1180,7 @@ const ADVANCED_BUCKETS = [
       { id: 'reassigned', label: 'A conversation is reassigned away from me' },
       { id: 'cust_reply', label: 'A customer replies' },
       { id: 'merged', label: 'A conversation is merged into another' },
+      { id: 'all_mention', label: 'Someone uses @all in a note' },
     ],
   },
   {
@@ -1128,23 +1190,33 @@ const ADVANCED_BUCKETS = [
       { id: 'resolved', label: 'A conversation is marked resolved' },
       { id: 'csat', label: 'CSAT feedback is received' },
       { id: 'auto_closed', label: 'A conversation is auto-closed due to inactivity' },
+      { id: 'review_action', label: 'A conversation needs your review' },
     ],
   },
   {
     id: 'message_activity',
     name: 'Message activity',
     items: [
-      { id: 'reaction_added', label: 'Someone reacts to your message', caption: 'Only for Slack, Chat and WhatsApp' },
-      { id: 'window_closing', label: 'Reply window is about to close', caption: 'Only for WhatsApp and SMS' },
-      { id: 'missed_call', label: 'You missed a call', caption: 'Only for Voice' },
-      { id: 'email_bounce', label: 'An email bounces or fails to deliver', caption: 'Only for Email' },
+      { id: 'reaction_added', label: 'Someone reacts to your message', channels: ['slack', 'chat', 'whatsapp'] },
+      { id: 'window_closing', label: 'Reply window is about to close', channels: ['whatsapp', 'sms'] },
+      { id: 'missed_call', label: 'You missed a call', channels: ['voice'] },
+      { id: 'email_bounce', label: 'An email bounces or fails to deliver', channels: ['email'] },
+    ],
+  },
+  {
+    id: 'workspace_updates',
+    name: 'Workspace updates',
+    items: [
+      { id: 'ooo_update', label: "A teammate's Out of Office status changes" },
+      { id: 'hiver_updates', label: 'New Hiver product updates' },
     ],
   },
 ];
 
 const ALL_BUCKETS = [{ id: 'primary_flat', name: '', items: PRIMARY_ITEMS }, ...ADVANCED_BUCKETS];
 
-const DEFAULT_OFF = new Set(['reassigned', 'cust_reply', 'csat', 'resolved', 'reaction_added', 'merged', 'auto_closed']);
+// All advanced-settings activities are off by default; only the primary (Basic settings) items are on.
+const DEFAULT_OFF = new Set(ADVANCED_BUCKETS.flatMap(b => b.items.map(item => item.id)));
 
 const SNOOZE_OPTIONS = [
   { id: '30m', label: 'For 30 minutes', ms: 30 * 60 * 1000 },
@@ -1182,6 +1254,9 @@ function buildDefaults() {
 
 const state = {
   enabled: buildDefaults(),
+  // Simulates which channels this inbox actually has connected; activities and captions
+  // that only apply to inactive channels are filtered out or reworded.
+  activeChannels: [...ALL_CHANNEL_IDS],
   advancedOpen: false,
   soundOn: true,
   soundMode: 'single',
@@ -1373,9 +1448,11 @@ function renderSnoozeDropdown() {
   wrap.className = 'tone-dropdown';
   const trigger = document.createElement('button');
   trigger.type = 'button';
-  trigger.className = 'tone-dropdown-trigger';
-  trigger.innerHTML = `<span>Pause notifications</span>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  trigger.className = 'tone-dropdown-trigger snooze-trigger';
+  trigger.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 15V9m5 6V9m7.5 3c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10Z"></path></svg>
+      <span>Pause notifications</span>
+    </span>`;
 
   const menu = document.createElement('div');
   menu.className = 'tone-dropdown-menu';
@@ -1435,9 +1512,17 @@ document.getElementById('resumeBtn').addEventListener('click', () => {
 function closeAllMenus() {
   document.querySelectorAll('body > .tone-dropdown-menu').forEach(m => m.parentNode.removeChild(m));
 }
+function closeAllChanMenus(except) {
+  document.querySelectorAll('.chan-menu.open').forEach(m => { if (m !== except) m.classList.remove('open'); });
+}
 document.addEventListener('click', (e) => {
-  if (e.target.closest('.tone-dropdown') || e.target.closest('.tone-dropdown-menu')) return;
-  closeAllMenus();
+  if (e.target.closest('.tone-dropdown') || e.target.closest('.tone-dropdown-menu')) {
+    // fall through to still close chan-menus below
+  } else {
+    closeAllMenus();
+  }
+  if (e.target.closest('.chan-menu') || e.target.closest('.chan-trigger')) return;
+  closeAllChanMenus();
 });
 
 // ---- Render Buckets Card ----
@@ -1464,7 +1549,8 @@ function renderBucketsCard() {
   const bucketDiv = document.createElement('div');
   bucketDiv.className = 'notify-bucket';
   PRIMARY_ITEMS.forEach(item => {
-    bucketDiv.appendChild(createActivityRow(item, false));
+    const row = createActivityRow(item, false);
+    if (row) bucketDiv.appendChild(row);
   });
   basicCard.appendChild(bucketDiv);
 
@@ -1473,10 +1559,6 @@ function renderBucketsCard() {
   advCard.innerHTML = '';
 
   ADVANCED_BUCKETS.forEach((bucket) => {
-    const div = document.createElement('div');
-    div.className = 'notify-divider';
-    advCard.appendChild(div);
-
     const bucketDiv = document.createElement('div');
     bucketDiv.className = 'notify-bucket';
 
@@ -1485,10 +1567,16 @@ function renderBucketsCard() {
     title.textContent = bucket.name;
     bucketDiv.appendChild(title);
 
+    let visibleCount = 0;
     bucket.items.forEach(item => {
-      bucketDiv.appendChild(createActivityRow(item, true));
+      const row = createActivityRow(item, true);
+      if (row) { bucketDiv.appendChild(row); visibleCount += 1; }
     });
+    if (visibleCount === 0) return; // whole bucket is hidden
 
+    const div = document.createElement('div');
+    div.className = 'notify-divider';
+    advCard.appendChild(div);
     advCard.appendChild(bucketDiv);
   });
 
@@ -1496,18 +1584,34 @@ function renderBucketsCard() {
 }
 
 function createActivityRow(item, isAdvanced = false) {
+  // Fully channel-restricted activities disappear entirely once none of their
+  // channels are active (e.g. "Message delivery fails" needs SMS, WhatsApp or Voice).
+  let captionText = null;
+  if (item.channels) {
+    const overlap = item.channels.filter(c => state.activeChannels.includes(c));
+    if (overlap.length === 0) return null;
+    captionText = `Only for ${joinNames(overlap, 'and')}`;
+  } else if (item.captionChannels) {
+    const overlap = item.captionChannels.filter(c => state.activeChannels.includes(c));
+    if (overlap.length > 0) captionText = item.captionTemplate(joinNames(overlap, item.captionConjunction));
+  } else if (item.caption) {
+    captionText = item.caption;
+  }
+
   const row = document.createElement('div');
   row.className = 'notify-row';
 
-  if (item.caption) {
+  if (captionText) {
     const group = document.createElement('span');
     group.className = 'notify-row-label-group';
     const label = document.createElement('span');
     label.className = 'notify-row-label';
-    label.textContent = item.label;
+    label.textContent = (item.id === 'new_convo' && state.activeChannels.includes('voice'))
+      ? 'A new conversation/call comes in'
+      : item.label;
     const caption = document.createElement('span');
     caption.className = 'notify-row-caption';
-    caption.textContent = item.caption;
+    caption.textContent = captionText;
     group.appendChild(label);
     group.appendChild(caption);
     row.appendChild(group);
@@ -1523,7 +1627,8 @@ function createActivityRow(item, isAdvanced = false) {
   sw.role = 'switch';
   sw.setAttribute('aria-checked', state.enabled[item.id]);
   sw.innerHTML = '<span class="notify-switch-handle"></span>';
-  sw.addEventListener('click', () => {
+  sw.addEventListener('click', (e) => {
+    e.stopPropagation();
     state.enabled[item.id] = !state.enabled[item.id];
     sw.classList.toggle('on', state.enabled[item.id]);
     sw.setAttribute('aria-checked', state.enabled[item.id]);
@@ -1559,7 +1664,7 @@ document.getElementById('bulkToneSlot').appendChild(bulkToneDropdown.el);
 const channelToneDropdowns = {};
 function renderChannelTones() {
   channelToneList.innerHTML = '';
-  CHANNELS.forEach(c => {
+  CHANNELS.filter(c => state.activeChannels.includes(c.id)).forEach(c => {
     const row = document.createElement('div');
     row.className = 'notify-sound-channel-row';
     const label = document.createElement('span');
@@ -1704,11 +1809,107 @@ if (permissionCloseBtn) {
   });
 }
 
+// ---- Active channels (simulates which channels this inbox has connected) ----
+function activeChannelsLabel() {
+  const sel = state.activeChannels;
+  if (sel.length === 0) return 'No channels';
+  if (sel.length === ALL_CHANNEL_IDS.length) return 'All channels';
+  const names = ALL_CHANNEL_IDS.filter(id => sel.includes(id)).map(id => CHANNEL_NAME[id]);
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+function renderActiveChannelsDropdown() {
+  const slot = document.getElementById('activeChannelsSlot');
+  slot.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chan-dropdown';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'chan-trigger';
+  trigger.innerHTML = `<span class="chan-trigger-label"></span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  const menu = document.createElement('div');
+  menu.className = 'chan-menu';
+
+  function refreshLabel() { trigger.querySelector('.chan-trigger-label').textContent = activeChannelsLabel(); }
+  refreshLabel();
+
+  const allOpt = document.createElement('label');
+  allOpt.className = 'chan-option';
+  const allBox = document.createElement('input');
+  allBox.type = 'checkbox';
+  const allSpan = document.createElement('span');
+  allSpan.textContent = 'All channels';
+  allOpt.appendChild(allBox); allOpt.appendChild(allSpan);
+  menu.appendChild(allOpt);
+
+  const divider = document.createElement('div');
+  divider.className = 'chan-menu-divider';
+  menu.appendChild(divider);
+
+  const boxes = {};
+
+  function refreshAllBox() {
+    const selCount = state.activeChannels.length;
+    allBox.checked = selCount === ALL_CHANNEL_IDS.length;
+    allBox.indeterminate = selCount > 0 && selCount < ALL_CHANNEL_IDS.length;
+  }
+  refreshAllBox();
+
+  allBox.addEventListener('change', () => {
+    state.activeChannels = allBox.checked ? [...ALL_CHANNEL_IDS] : [];
+    ALL_CHANNEL_IDS.forEach(chId => { boxes[chId].checked = allBox.checked; });
+    allBox.indeterminate = false;
+    refreshLabel();
+    renderBucketsCard();
+    renderChannelTones();
+  });
+
+  ALL_CHANNEL_IDS.forEach(chId => {
+    const opt = document.createElement('label');
+    opt.className = 'chan-option';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = state.activeChannels.includes(chId);
+    boxes[chId] = box;
+    box.addEventListener('change', () => {
+      const cur = new Set(state.activeChannels);
+      if (box.checked) cur.add(chId); else cur.delete(chId);
+      state.activeChannels = ALL_CHANNEL_IDS.filter(id => cur.has(id));
+      refreshAllBox();
+      refreshLabel();
+      renderBucketsCard();
+      renderChannelTones();
+    });
+    const span = document.createElement('span');
+    span.textContent = CHANNEL_NAME[chId];
+    opt.appendChild(box); opt.appendChild(span);
+    menu.appendChild(opt);
+  });
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    closeAllChanMenus();
+    if (!isOpen) menu.classList.add('open');
+  });
+
+  menu.addEventListener('click', (e) => e.stopPropagation());
+
+  wrap.appendChild(trigger); wrap.appendChild(menu);
+  slot.appendChild(wrap);
+}
+
 // ---- Initialize ----
 renderBucketsCard();
 renderSnoozeDropdown();
 updateSoundMode();
 updatePermissionBanner();
+renderActiveChannelsDropdown();
 </script>
 
 <div id="agentation-root"></div>

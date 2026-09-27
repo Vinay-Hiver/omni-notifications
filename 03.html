@@ -11,6 +11,9 @@
   :root {
     --slateSurfaceWhite: #ffffff;
     --slateSurfaceSubtle: #f8fafc;
+    --slateSurfaceSubtle100: #f1f5f9;
+    --slateSurfaceSlate150: #edf1f6;
+    --slateSurfaceSubtle300: #cbd5e1;
     --slateSurfaceDefault: #94a3b8;
     --slateSurfaceDisabled: #e2e8f0;
     --slateBorderLight: #e2e8f0;
@@ -37,7 +40,7 @@
   }
   * { box-sizing: border-box; }
   button, select, input, textarea { font-family: inherit; }
-  body { margin: 0; background: var(--slateSurfaceWhite); color: var(--slateTextBody); }
+  body { margin: 0; background: var(--slateSurfaceWhite); color: var(--slateTextBody); -webkit-font-smoothing: antialiased; }
 
   .page { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
@@ -57,7 +60,7 @@
   .mini-item.notification-wrapper { position: relative; }
   .notification-dot { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; }
   .avatar-container { position: relative; cursor: pointer; }
-  .avatar { width: 28px; height: 28px; background-color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; }
+  .avatar { width: 28px; height: 28px; background-color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; line-height: 20px; font-weight: 600; }
   .status-indicator.online { position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; background-color: #10b981; border: 1.5px solid var(--slateSurfaceDarkest); border-radius: 50%; }
   .mini-item .tooltip { position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 10px; background-color: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 400; white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s; pointer-events: none; z-index: 1000; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
   .mini-item:hover .tooltip { opacity: 1; visibility: visible; }
@@ -75,45 +78,50 @@
   .topbar { height: 60px; flex-shrink: 0; border-bottom: 1px solid var(--slateBorderLight); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
   .topbar h1 { font-size: 16px; font-weight: 500; margin: 0; color: var(--slateTextTitle); }
   .proto-switcher { display: flex; border: 1px solid var(--slateBorderLight); border-radius: 6px; overflow: hidden; }
-  .proto-switcher a { font-size: 13px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
+  .proto-switcher a { font-size: 14px; line-height: 20px; font-weight: 500; padding: 6px 14px; color: var(--slateTextBody); text-decoration: none; }
   .proto-switcher a + a { border-left: 1px solid var(--slateBorderLight); }
   .proto-switcher a.active { background: var(--slateSurfaceSubtle); color: var(--primarySurfaceDefault); font-weight: 700; }
+  .topbar-controls { display: flex; align-items: center; gap: 20px; }
+  .active-channels-control { display: flex; align-items: center; gap: 8px; }
+  .active-channels-label { font-size: 14px; line-height: 20px; color: var(--slateTextSubtle); white-space: nowrap; }
 
   .main { flex: 1; overflow-y: auto; padding: 40px 60px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
   .block { display: flex; flex-direction: column; gap: 12px; width: 900px; max-width: 100%; }
 
   .title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .title-row h2 { font-size: 18px; font-weight: 500; margin: 0; color: var(--slateTextTitle); }
-  .subtext { font-size: 13px; color: var(--slateTextSubtle); margin: 2px 0 0; }
+  .title-row h2 { font-size: 16px; font-weight: 500; line-height: 24px; margin: 0; color: var(--slateTextTitle); }
+  .subtext { font-size: 14px; line-height: 20px; color: var(--slateTextSubtle); margin: 2px 0 0; }
 
   /* ---- per-section container ---- */
   .section-card { border: 1px solid var(--slateBorderMild); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
   .section-title { font-size: 14px; font-weight: 500; color: var(--slateTextTitle); margin: 0; }
-  .section-rows { display: flex; flex-direction: column; gap: 10px; }
+  .section-rows { display: flex; flex-direction: column; gap: 12px; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 32px; padding: 0; }
   .row + .row { border-top: 1px solid var(--slateBorderMild); padding-top: 10px; }
   .row-label-group { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 2px 0; }
-  .row-label { font-size: 14px; color: var(--slateTextTitle); }
+  .row-label { font-size: 14px; color: var(--slateTextBody); }
   .row-caption { font-size: 12px; color: var(--slateTextSubtle); }
+
+  /* ---- Basic/Advanced tab content: no card border/padding, no row dividers ---- */
+  #basicCard, #advancedCard { border: none; padding: 0; }
+  #basicCard .section-rows { gap: 12px; }
   .row-controls { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
 
-  /* ---- Advanced settings (ported from 02.html) ---- */
-  .advanced-block {
-    width: 900px; max-width: 100%; margin-top: -24px; /* parent gap is 32px; this makes the visible gap 8px */
-    border: 1px solid var(--slateBorderMild); border-radius: 8px; padding: 14px; gap: 14px;
+  /* ---- Basic/Advanced tabs (per Figma node 133-27723) ---- */
+  .settings-tabs { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid var(--slateBorderLight); width: 100%; }
+  .settings-tab {
+    background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    height: 36px; padding: 8px 12px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-family); font-size: 14px; font-weight: 400; color: var(--slateTextSubtle); cursor: pointer;
   }
-  .advanced-block .title-row { align-items: center; }
-  .advanced-block h2 { font-size: 16px; font-weight: 500; line-height: 24px; color: var(--slateTextTitle); margin: 0; }
-  .advanced-chevron-btn { display: inline-flex; align-items: center; justify-content: center; border: none; background: none; padding: 0; cursor: pointer; flex-shrink: 0; }
-  .advanced-chevron { width: 16px; height: 16px; color: var(--slateTextSubtle); transition: transform 0.2s ease; }
-  .advanced-chevron-btn[aria-expanded="true"] .advanced-chevron { transform: rotate(180deg); }
+  .settings-tab.active { font-weight: 500; color: var(--slateTextBody); border-bottom-color: var(--slateTextBody); }
   .advanced-content { display: flex; flex-direction: column; gap: 20px; width: 100%; }
   .advanced-divider { height: 1px; background: var(--slateBorderMild); width: 100%; }
 
   /* ---- channel multi-select dropdown ---- */
   .chan-dropdown { position: relative; }
   .chan-trigger {
-    border: 1.5px solid var(--slateBorderLight);
+    border: 1.5px solid var(--slateBorderMild);
     background: var(--slateSurfaceWhite);
     border-radius: 6px;
     padding: 6px 8px;
@@ -128,6 +136,8 @@
     white-space: nowrap;
   }
   .chan-trigger[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .snooze-trigger { background: var(--slateSurfaceSubtle100); border: none; height: 32px; }
+  .snooze-trigger:hover { background: var(--slateSurfaceSlate150); }
   .chan-trigger svg { flex-shrink: 0; }
   .chan-menu {
     position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
@@ -153,6 +163,7 @@
   .snooze-banner { background: rgba(230,239,253,.5); border: .5px solid var(--blueBorderLight); border-radius: 8px; padding: 12px; display: none; align-items: center; justify-content: space-between; gap: 12px; }
   .snooze-banner.show { display: flex; }
   .snooze-banner p { flex: 1; min-width: 0; margin: 0; font-size: 14px; color: var(--pastelLightBlueTextBody); }
+  #snoozeUntilText { font-size: 14px; font-weight: 500; line-height: 20px; }
   .snooze-resume { border: none; background: none; padding: 4px 12px; font-size: 14px; font-weight: 500; color: var(--pastelLightBlueTextBody); cursor: pointer; }
 
   /* ---- desktop notification permission banner ---- */
@@ -186,7 +197,7 @@
   /* ---- tone dropdown (ported verbatim from src/components/ToneDropdown.css) ---- */
   .tone-dropdown { position: relative; }
   .tone-dropdown-trigger {
-    border: 1.5px solid var(--slateBorderLight);
+    border: 1.5px solid var(--slateBorderMild);
     background: var(--slateSurfaceWhite);
     border-radius: 6px;
     padding: 6px 8px;
@@ -323,9 +334,16 @@
   <div class="content">
     <header class="topbar">
       <h1>Notification settings</h1>
-      <div class="proto-switcher">
-        <a href="/">Option 1</a>
-        <a href="/03.html" class="active">Option 2</a>
+      <div class="topbar-controls">
+        <div class="active-channels-control">
+          <span class="active-channels-label">Active channels</span>
+          <div id="activeChannelsSlot"></div>
+        </div>
+        <div class="proto-switcher">
+          <a href="/">Option 1</a>
+          <a href="/02.html">Option 2</a>
+          <a href="/03.html" class="active">Option 3</a>
+        </div>
       </div>
     </header>
 
@@ -338,38 +356,8 @@
       </div>
 
       <div class="block">
-        <div class="title-row">
-          <div>
-            <h2>Basic settings</h2>
-            <p class="subtext">Choose which activities notify you, and on which channels</p>
-          </div>
-          <div id="snoozeDropdownSlot"></div>
-        </div>
-
-        <div class="snooze-banner" id="snoozeBanner">
-          <p>Notifications paused until <strong id="snoozeUntilText"></strong></p>
-          <button class="snooze-resume" id="resumeBtn">Resume now</button>
-        </div>
-
-        <div class="section-card" id="basicCard"></div>
-      </div>
-
-      <div class="block advanced-block" id="advHeader" style="cursor: pointer;">
-        <div class="title-row">
-          <div>
-            <h2>Advanced settings</h2>
-            <p class="subtext">Less-common activity updates and channel-specific alerts</p>
-          </div>
-          <button class="advanced-chevron-btn" type="button" aria-expanded="false" id="advToggleBtn">
-            <svg class="advanced-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </button>
-        </div>
-        <div class="advanced-content" id="advancedCard" style="display: none;"></div>
-      </div>
-
-      <div class="block">
         <header>
-          <p class="section-title" style="font-size:18px;">Notification sound</p>
+          <p class="section-title" style="font-size:16px; line-height:24px;">Notification sound</p>
           <p class="subtext" id="soundDesc">Choose the sound that plays when a notification arrives</p>
         </header>
         <div class="sound-card">
@@ -395,6 +383,29 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="block">
+        <div class="title-row">
+          <div>
+            <h2>Customize notifications</h2>
+            <p class="subtext">Choose which activities notify you, and on which channels</p>
+          </div>
+          <div id="snoozeDropdownSlot"></div>
+        </div>
+
+        <div class="snooze-banner" id="snoozeBanner">
+          <p>Notifications paused until <strong id="snoozeUntilText"></strong></p>
+          <button class="snooze-resume" id="resumeBtn">Resume now</button>
+        </div>
+
+        <div class="settings-tabs" role="tablist">
+          <button class="settings-tab active" type="button" role="tab" id="tabBasicBtn">Basic settings</button>
+          <button class="settings-tab" type="button" role="tab" id="tabAdvancedBtn">Advanced</button>
+        </div>
+
+        <div class="section-card" id="basicCard"></div>
+        <div class="advanced-content" id="advancedCard" style="display: none;"></div>
       </div>
     </main>
 
@@ -439,11 +450,16 @@ const PRIMARY_ITEMS = [
   { id: 'assigned', label: 'A conversation is assigned to me' },
   { id: 'reply_mine', label: 'A new reply on a conversation assigned to me' },
   { id: 'mention', label: 'Someone @mentions me in a note' },
-  { id: 'new_convo', label: 'A new conversation comes in', caption: "Real-time Chat, Slack, SMS or WhatsApp notifications won't show in the notification panel" },
+  {
+    id: 'new_convo', label: 'A new conversation comes in',
+    captionChannels: ['chat', 'slack', 'sms', 'whatsapp'], captionConjunction: 'or',
+    captionTemplate: (names) => `Real-time ${names} notifications won't show in the notification panel`,
+  },
   { id: 'sla_first', label: 'First-response SLA is about to breach' },
+  { id: 'sla_next', label: 'Next-response SLA is about to breach' },
   { id: 'sla_res', label: 'Resolution SLA is breached' },
   { id: 'reopened', label: 'A conversation is reopened' },
-  { id: 'delivery_failed', label: 'Message delivery fails', caption: 'Only for SMS, WhatsApp and Voice', channels: ['sms', 'whatsapp', 'voice'] },
+  { id: 'delivery_failed', label: 'Message delivery fails', channels: ['sms', 'whatsapp', 'voice'] },
 ];
 
 // Advanced: secondary event notifications & channel-specific alerts (same categorization as 02.html)
@@ -456,6 +472,7 @@ const ADVANCED_BUCKETS = [
       { id: 'reassigned', label: 'A conversation is reassigned away from me' },
       { id: 'cust_reply', label: 'A customer replies' },
       { id: 'merged', label: 'A conversation is merged into another' },
+      { id: 'all_mention', label: 'Someone uses @all in a note' },
     ],
   },
   {
@@ -465,23 +482,33 @@ const ADVANCED_BUCKETS = [
       { id: 'resolved', label: 'A conversation is marked resolved' },
       { id: 'csat', label: 'CSAT feedback is received' },
       { id: 'auto_closed', label: 'A conversation is auto-closed due to inactivity' },
+      { id: 'review_action', label: 'A conversation needs your review' },
     ],
   },
   {
     id: 'message_activity',
     name: 'Message activity',
     items: [
-      { id: 'reaction_added', label: 'Someone reacts to your message', caption: 'Only for Slack, Chat and WhatsApp', channels: ['slack', 'chat', 'whatsapp'] },
-      { id: 'window_closing', label: 'Reply window is about to close', caption: 'Only for WhatsApp and SMS', channels: ['whatsapp', 'sms'] },
-      { id: 'missed_call', label: 'You missed a call', caption: 'Only for Voice', channels: ['voice'] },
-      { id: 'email_bounce', label: 'An email bounces or fails to deliver', caption: 'Only for Email', channels: ['email'] },
+      { id: 'reaction_added', label: 'Someone reacts to your message', channels: ['slack', 'chat', 'whatsapp'] },
+      { id: 'window_closing', label: 'Reply window is about to close', channels: ['whatsapp', 'sms'] },
+      { id: 'missed_call', label: 'You missed a call', channels: ['voice'] },
+      { id: 'email_bounce', label: 'An email bounces or fails to deliver', channels: ['email'] },
+    ],
+  },
+  {
+    id: 'workspace_updates',
+    name: 'Workspace updates',
+    items: [
+      { id: 'ooo_update', label: "A teammate's Out of Office status changes" },
+      { id: 'hiver_updates', label: 'New Hiver product updates' },
     ],
   },
 ];
 
 const ALL_BUCKETS = [{ id: 'primary_flat', name: '', items: PRIMARY_ITEMS }, ...ADVANCED_BUCKETS];
 
-const DEFAULT_OFF = new Set(['reassigned', 'cust_reply', 'csat', 'resolved', 'reaction_added', 'merged', 'auto_closed']);
+// All advanced-settings activities are off by default; only the primary (Basic settings) items are on.
+const DEFAULT_OFF = new Set(ADVANCED_BUCKETS.flatMap(b => b.items.map(item => item.id)));
 
 const SNOOZE_OPTIONS = [
   { id: '30m', label: 'For 30 minutes', ms: 30 * 60 * 1000 },
@@ -490,19 +517,52 @@ const SNOOZE_OPTIONS = [
 ];
 
 // ---- state ----
-const state = { enabled: {}, channelSel: {}, advancedOpen: false, isDirty: false, snoozeUntil: null };
+// There is no separate on/off toggle: an activity is "on" whenever it has at least
+// one channel selected, and "off" when its channel selection is empty.
+// activeChannels simulates which channels this inbox actually has connected; activities
+// and captions that only apply to inactive channels are filtered out or reworded.
+//
+// channelMode tracks, per activity, whether its channel selection is symbolic ('all' or
+// 'none') or a literal customized list ('custom'). Symbolic selections stay in sync as
+// activeChannels changes (e.g. "all" always means every currently active channel); only
+// a 'custom' selection is a fixed list that just gets pruned when a channel deactivates.
+const state = { channelSel: {}, channelMode: {}, activeChannels: [...ALL_CHANNEL_IDS], activeTab: 'basic', isDirty: false, snoozeUntil: null };
+
+function joinNames(ids, conjunction = 'and') {
+  const names = ids.map(id => CHANNEL_NAME[id]);
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} ${conjunction} ${names[names.length - 1]}`;
+}
 
 function allActivities() {
   return ALL_BUCKETS.flatMap(b => b.items);
 }
 
 function buildDefaults() {
-  const enabled = {}; const channelSel = {};
+  const channelMode = {};
+  const channelSel = {};
   allActivities().forEach(item => {
-    enabled[item.id] = !DEFAULT_OFF.has(item.id);
-    channelSel[item.id] = [...(item.channels || ALL_CHANNEL_IDS)];
+    channelMode[item.id] = DEFAULT_OFF.has(item.id) ? 'none' : 'all';
+    channelSel[item.id] = [];
   });
-  return { enabled, channelSel };
+  return { channelMode, channelSel };
+}
+
+function activityOptions(activityId) {
+  const activity = allActivities().find(a => a.id === activityId);
+  const rawOptions = activity.channels || ALL_CHANNEL_IDS;
+  return rawOptions.filter(c => state.activeChannels.includes(c));
+}
+
+// The channels actually selected for an activity right now: symbolic 'all'/'none' modes
+// are recomputed live against the current active channels; 'custom' is a fixed list.
+function effectiveChannels(activityId) {
+  const options = activityOptions(activityId);
+  const mode = state.channelMode[activityId];
+  if (mode === 'all') return [...options];
+  if (mode === 'none') return [];
+  return state.channelSel[activityId].filter(c => options.includes(c));
 }
 
 function markDirty() {
@@ -513,13 +573,14 @@ function markDirty() {
 
 function channelLabel(activityId) {
   const activity = allActivities().find(a => a.id === activityId);
-  const options = activity.channels || ALL_CHANNEL_IDS;
-  const sel = state.channelSel[activityId];
-  if (sel.length === 0) return 'No channels';
-  if (sel.length === options.length) {
-    // Only unrestricted activities (options === every channel) collapse to "All channels";
-    // a channel-restricted activity should always spell out its (subset of) channels.
-    if (options.length === ALL_CHANNEL_IDS.length) return 'All channels';
+  const options = activityOptions(activityId);
+  const sel = effectiveChannels(activityId);
+  if (sel.length === 0) return 'Notifications off';
+  if (state.channelMode[activityId] === 'all' && !activity.channels && options.length > 1) {
+    // Only unrestricted activities collapse to "All channels" (meaning every active channel);
+    // a channel-restricted activity should always spell out its (subset of) channels, and with
+    // just one active channel there's nothing to collapse — just name that one channel.
+    return 'All channels';
   }
   const names = ALL_CHANNEL_IDS.filter(id => sel.includes(id)).map(id => CHANNEL_NAME[id]);
   if (names.length === 1) return names[0];
@@ -535,16 +596,14 @@ function closeAllChanMenus(except) {
   });
 }
 
-function renderChannelDropdown(activityId, enabledNow, onForceDisable) {
-  const activity = allActivities().find(a => a.id === activityId);
-  const options = activity.channels || ALL_CHANNEL_IDS;
+function renderChannelDropdown(activityId) {
+  const options = activityOptions(activityId);
   const wrap = document.createElement('div');
   wrap.className = 'chan-dropdown';
 
   const trigger = document.createElement('button');
   trigger.type = 'button';
   trigger.className = 'chan-trigger';
-  trigger.disabled = !enabledNow;
   trigger.innerHTML = `<span class="chan-trigger-label"></span>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
@@ -554,31 +613,36 @@ function renderChannelDropdown(activityId, enabledNow, onForceDisable) {
   function refreshLabel() { trigger.querySelector('.chan-trigger-label').textContent = channelLabel(activityId); }
   refreshLabel();
 
-  // "All channels" master checkbox
-  const allOpt = document.createElement('label');
-  allOpt.className = 'chan-option';
+  // "All channels" master checkbox — only worth showing when there's more than one
+  // channel to choose from; with a single option it would just duplicate that checkbox.
   const allBox = document.createElement('input');
   allBox.type = 'checkbox';
-  const allSpan = document.createElement('span');
-  allSpan.textContent = 'All channels';
-  allOpt.appendChild(allBox); allOpt.appendChild(allSpan);
-  menu.appendChild(allOpt);
+  if (options.length > 1) {
+    const allOpt = document.createElement('label');
+    allOpt.className = 'chan-option';
+    const allSpan = document.createElement('span');
+    allSpan.textContent = 'All channels';
+    allOpt.appendChild(allBox); allOpt.appendChild(allSpan);
+    menu.appendChild(allOpt);
 
-  const divider = document.createElement('div');
-  divider.className = 'chan-menu-divider';
-  menu.appendChild(divider);
+    const divider = document.createElement('div');
+    divider.className = 'chan-menu-divider';
+    menu.appendChild(divider);
+  }
 
   const boxes = {};
 
   function refreshAllBox() {
-    const selCount = state.channelSel[activityId].length;
+    const selCount = effectiveChannels(activityId).length;
     allBox.checked = selCount === options.length;
     allBox.indeterminate = selCount > 0 && selCount < options.length;
   }
   refreshAllBox();
 
   allBox.addEventListener('change', () => {
-    state.channelSel[activityId] = allBox.checked ? [...options] : [];
+    // Checking/unchecking the master box is a symbolic choice: "all" tracks active
+    // channels going forward, "none" means off, rather than freezing a literal list.
+    state.channelMode[activityId] = allBox.checked ? 'all' : 'none';
     options.forEach(chId => { boxes[chId].checked = allBox.checked; });
     allBox.indeterminate = false;
     refreshLabel();
@@ -590,12 +654,18 @@ function renderChannelDropdown(activityId, enabledNow, onForceDisable) {
     opt.className = 'chan-option';
     const box = document.createElement('input');
     box.type = 'checkbox';
-    box.checked = state.channelSel[activityId].includes(chId);
+    box.checked = effectiveChannels(activityId).includes(chId);
     boxes[chId] = box;
     box.addEventListener('change', () => {
-      const cur = new Set(state.channelSel[activityId]);
+      const cur = new Set(effectiveChannels(activityId));
       if (box.checked) cur.add(chId); else cur.delete(chId);
-      state.channelSel[activityId] = options.filter(id => cur.has(id));
+      const next = options.filter(id => cur.has(id));
+      // A hand-picked selection is only symbolic again if it happens to match the
+      // extremes (every active channel, or none of them); anything in between is a
+      // fixed custom list that won't auto-expand if more channels become active later.
+      if (next.length === options.length) state.channelMode[activityId] = 'all';
+      else if (next.length === 0) state.channelMode[activityId] = 'none';
+      else { state.channelMode[activityId] = 'custom'; state.channelSel[activityId] = next; }
       refreshAllBox();
       refreshLabel();
       markDirty();
@@ -608,7 +678,6 @@ function renderChannelDropdown(activityId, enabledNow, onForceDisable) {
 
   trigger.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (trigger.disabled) return;
     const isOpen = menu.classList.contains('open');
     closeAllChanMenus();
     if (!isOpen) menu.classList.add('open');
@@ -616,22 +685,25 @@ function renderChannelDropdown(activityId, enabledNow, onForceDisable) {
 
   menu.addEventListener('click', (e) => e.stopPropagation());
 
-  menu._checkEmptyOnClose = () => {
-    if (state.enabled[activityId] && state.channelSel[activityId].length === 0) {
-      state.enabled[activityId] = false;
-      refreshLabel();
-      trigger.disabled = true;
-      if (onForceDisable) onForceDisable();
-      markDirty();
-    }
-  };
-
   wrap.appendChild(trigger); wrap.appendChild(menu);
-  wrap._refresh = () => { trigger.disabled = !state.enabled[activityId]; refreshLabel(); };
   return wrap;
 }
 
 function renderRow(activity) {
+  // Fully channel-restricted activities disappear entirely once none of their
+  // channels are active (e.g. "Message delivery fails" needs SMS, WhatsApp or Voice).
+  let captionText = null;
+  if (activity.channels) {
+    const overlap = activity.channels.filter(c => state.activeChannels.includes(c));
+    if (overlap.length === 0) return null;
+    captionText = `Only for ${joinNames(overlap, 'and')}`;
+  } else if (activity.captionChannels) {
+    const overlap = activity.captionChannels.filter(c => state.activeChannels.includes(c));
+    if (overlap.length > 0) captionText = activity.captionTemplate(joinNames(overlap, activity.captionConjunction));
+  } else if (activity.caption) {
+    captionText = activity.caption;
+  }
+
   const row = document.createElement('div');
   row.className = 'row';
 
@@ -639,49 +711,33 @@ function renderRow(activity) {
   labelGroup.className = 'row-label-group';
   const label = document.createElement('span');
   label.className = 'row-label';
-  label.textContent = activity.label;
+  label.textContent = (activity.id === 'new_convo' && state.activeChannels.includes('voice'))
+    ? 'A new conversation/call comes in'
+    : activity.label;
   labelGroup.appendChild(label);
-  if (activity.caption) {
+  if (captionText) {
     const cap = document.createElement('span');
     cap.className = 'row-caption';
-    cap.textContent = activity.caption;
+    cap.textContent = captionText;
     labelGroup.appendChild(cap);
   }
 
   const controls = document.createElement('div');
   controls.className = 'row-controls';
-  const sw = document.createElement('button');
-  sw.className = `switch ${state.enabled[activity.id] ? 'on' : ''}`;
-  sw.innerHTML = '<span class="switch-handle"></span>';
-  const chanDropdown = renderChannelDropdown(activity.id, state.enabled[activity.id], () => {
-    sw.classList.remove('on');
-  });
-  sw.addEventListener('click', (e) => {
-    e.stopPropagation();
-    state.enabled[activity.id] = !state.enabled[activity.id];
-    sw.classList.toggle('on', state.enabled[activity.id]);
-    chanDropdown._refresh();
-    markDirty();
-  });
+  const chanDropdown = renderChannelDropdown(activity.id);
 
   controls.appendChild(chanDropdown);
-  controls.appendChild(sw);
   row.appendChild(labelGroup);
   row.appendChild(controls);
   return row;
 }
 
-function updateAdvancedToggleUI() {
-  const advCard = document.getElementById('advancedCard');
-  const advToggleBtn = document.getElementById('advToggleBtn');
-  if (!advCard || !advToggleBtn) return;
-  if (state.advancedOpen) {
-    advCard.style.display = 'flex';
-    advToggleBtn.setAttribute('aria-expanded', 'true');
-  } else {
-    advCard.style.display = 'none';
-    advToggleBtn.setAttribute('aria-expanded', 'false');
-  }
+function setActiveTab(tab) {
+  state.activeTab = tab;
+  document.getElementById('basicCard').style.display = tab === 'basic' ? 'flex' : 'none';
+  document.getElementById('advancedCard').style.display = tab === 'advanced' ? 'flex' : 'none';
+  document.getElementById('tabBasicBtn').classList.toggle('active', tab === 'basic');
+  document.getElementById('tabAdvancedBtn').classList.toggle('active', tab === 'advanced');
 }
 
 function renderSections() {
@@ -690,13 +746,24 @@ function renderSections() {
   basicCard.innerHTML = '';
   const rows = document.createElement('div');
   rows.className = 'section-rows';
-  PRIMARY_ITEMS.forEach(item => rows.appendChild(renderRow(item)));
+  PRIMARY_ITEMS.forEach(item => {
+    const row = renderRow(item);
+    if (row) rows.appendChild(row);
+  });
   basicCard.appendChild(rows);
 
   // 2. Advanced settings content, nested inside the same card as the header
   const advCard = document.getElementById('advancedCard');
   advCard.innerHTML = '';
   ADVANCED_BUCKETS.forEach((bucket) => {
+    const bucketRows = document.createElement('div');
+    bucketRows.className = 'section-rows';
+    bucket.items.forEach(item => {
+      const row = renderRow(item);
+      if (row) bucketRows.appendChild(row);
+    });
+    if (!bucketRows.children.length) return; // whole bucket is hidden
+
     const divider = document.createElement('div');
     divider.className = 'advanced-divider';
     advCard.appendChild(divider);
@@ -710,16 +777,12 @@ function renderSections() {
     title.className = 'section-title';
     title.textContent = bucket.name;
     bucketWrap.appendChild(title);
-
-    const bucketRows = document.createElement('div');
-    bucketRows.className = 'section-rows';
-    bucket.items.forEach(item => bucketRows.appendChild(renderRow(item)));
     bucketWrap.appendChild(bucketRows);
 
     advCard.appendChild(bucketWrap);
   });
 
-  updateAdvancedToggleUI();
+  setActiveTab(state.activeTab);
 }
 
 // ---- snooze dropdown (reuses tone-dropdown-like trigger) ----
@@ -732,9 +795,11 @@ function renderSnoozeDropdown() {
   wrap.className = 'chan-dropdown';
   const trigger = document.createElement('button');
   trigger.type = 'button';
-  trigger.className = 'chan-trigger';
-  trigger.innerHTML = `<span>Pause notifications</span>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  trigger.className = 'chan-trigger snooze-trigger';
+  trigger.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 15V9m5 6V9m7.5 3c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10Z"></path></svg>
+      <span>Pause notifications</span>
+    </span>`;
   const menu = document.createElement('div');
   menu.className = 'chan-menu';
   SNOOZE_OPTIONS.forEach(opt => {
@@ -775,22 +840,9 @@ document.getElementById('resumeBtn').addEventListener('click', () => {
   updateSnoozeUI();
 });
 
-// ---- Advanced toggle ----
-const advToggleBtn = document.getElementById('advToggleBtn');
-const advHeader = document.getElementById('advHeader');
-function toggleAdvanced() {
-  state.advancedOpen = !state.advancedOpen;
-  updateAdvancedToggleUI();
-}
-if (advToggleBtn) {
-  advToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleAdvanced();
-  });
-}
-if (advHeader) {
-  advHeader.addEventListener('click', toggleAdvanced);
-}
+// ---- Basic/Advanced tabs ----
+document.getElementById('tabBasicBtn').addEventListener('click', () => setActiveTab('basic'));
+document.getElementById('tabAdvancedBtn').addEventListener('click', () => setActiveTab('advanced'));
 
 // ---- sound section ----
 // ---- tones (ported verbatim from src/data/tones.js) ----
@@ -1001,7 +1053,7 @@ document.getElementById('bulkToneSlot').appendChild(bulkToneDropdown.el);
 const channelToneDropdowns = {};
 function renderChannelTones() {
   channelToneList.innerHTML = '';
-  CHANNELS.forEach(c => {
+  CHANNELS.filter(c => state.activeChannels.includes(c.id)).forEach(c => {
     const row = document.createElement('div');
     row.className = 'channel-tone-row';
     const label = document.createElement('span');
@@ -1040,9 +1092,9 @@ document.getElementById('modalCancel').addEventListener('click', closeModal);
 function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
 document.getElementById('modalConfirm').addEventListener('click', () => {
   const defaults = buildDefaults();
-  state.enabled = defaults.enabled;
+  state.channelMode = defaults.channelMode;
   state.channelSel = defaults.channelSel;
-  state.advancedOpen = false;
+  state.activeTab = 'basic';
   state.isDirty = false;
   document.getElementById('saveBtn').disabled = true;
   document.getElementById('restoreBtn').disabled = true;
@@ -1115,12 +1167,108 @@ if (permissionCloseBtn) {
   });
 }
 
+// ---- Active channels (simulates which channels this inbox has connected) ----
+function activeChannelsLabel() {
+  const sel = state.activeChannels;
+  if (sel.length === 0) return 'No channels';
+  if (sel.length === ALL_CHANNEL_IDS.length) return 'All channels';
+  const names = ALL_CHANNEL_IDS.filter(id => sel.includes(id)).map(id => CHANNEL_NAME[id]);
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+function renderActiveChannelsDropdown() {
+  const slot = document.getElementById('activeChannelsSlot');
+  slot.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chan-dropdown';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'chan-trigger';
+  trigger.innerHTML = `<span class="chan-trigger-label"></span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  const menu = document.createElement('div');
+  menu.className = 'chan-menu';
+
+  function refreshLabel() { trigger.querySelector('.chan-trigger-label').textContent = activeChannelsLabel(); }
+  refreshLabel();
+
+  const allOpt = document.createElement('label');
+  allOpt.className = 'chan-option';
+  const allBox = document.createElement('input');
+  allBox.type = 'checkbox';
+  const allSpan = document.createElement('span');
+  allSpan.textContent = 'All channels';
+  allOpt.appendChild(allBox); allOpt.appendChild(allSpan);
+  menu.appendChild(allOpt);
+
+  const divider = document.createElement('div');
+  divider.className = 'chan-menu-divider';
+  menu.appendChild(divider);
+
+  const boxes = {};
+
+  function refreshAllBox() {
+    const selCount = state.activeChannels.length;
+    allBox.checked = selCount === ALL_CHANNEL_IDS.length;
+    allBox.indeterminate = selCount > 0 && selCount < ALL_CHANNEL_IDS.length;
+  }
+  refreshAllBox();
+
+  allBox.addEventListener('change', () => {
+    state.activeChannels = allBox.checked ? [...ALL_CHANNEL_IDS] : [];
+    ALL_CHANNEL_IDS.forEach(chId => { boxes[chId].checked = allBox.checked; });
+    allBox.indeterminate = false;
+    refreshLabel();
+    renderSections();
+    renderChannelTones();
+  });
+
+  ALL_CHANNEL_IDS.forEach(chId => {
+    const opt = document.createElement('label');
+    opt.className = 'chan-option';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = state.activeChannels.includes(chId);
+    boxes[chId] = box;
+    box.addEventListener('change', () => {
+      const cur = new Set(state.activeChannels);
+      if (box.checked) cur.add(chId); else cur.delete(chId);
+      state.activeChannels = ALL_CHANNEL_IDS.filter(id => cur.has(id));
+      refreshAllBox();
+      refreshLabel();
+      renderSections();
+      renderChannelTones();
+    });
+    const span = document.createElement('span');
+    span.textContent = CHANNEL_NAME[chId];
+    opt.appendChild(box); opt.appendChild(span);
+    menu.appendChild(opt);
+  });
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    closeAllChanMenus();
+    if (!isOpen) menu.classList.add('open');
+  });
+
+  menu.addEventListener('click', (e) => e.stopPropagation());
+
+  wrap.appendChild(trigger); wrap.appendChild(menu);
+  slot.appendChild(wrap);
+}
+
 // ---- init ----
 const defaults = buildDefaults();
-state.enabled = defaults.enabled;
+state.channelMode = defaults.channelMode;
 state.channelSel = defaults.channelSel;
 renderSections();
 renderSnoozeDropdown();
+renderActiveChannelsDropdown();
 updatePermissionBanner();
 </script>
 </body>
