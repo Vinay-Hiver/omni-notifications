@@ -936,6 +936,106 @@
     border-radius: 6px;
     cursor: pointer;
   }
+
+  /* ---- Notification panel (bell icon flyout) ---- */
+  .notif-panel-overlay { position: fixed; inset: 0; z-index: 999; display: none; }
+  .notif-panel-overlay.show { display: block; }
+  .notif-panel {
+    position: fixed; top: 10px; left: 54px; height: calc(100vh - 20px); width: 540px;
+    max-width: calc(100vw - 54px - 10px);
+    background: var(--slateSurfaceWhite); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
+    border-radius: 8px;
+    z-index: 1000; display: none; flex-direction: column; padding: 20px; gap: 20px;
+    transform: translateX(-10px); opacity: 0;
+    transition: transform 150ms ease-in-out, opacity 150ms ease-in-out;
+  }
+  .notif-panel.visible { display: flex; }
+  .notif-tabs { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--slateBorderLight); width: 100%; flex-shrink: 0; }
+  .notif-tab {
+    background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    height: 36px; padding: 8px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-family); font-size: 14px; font-weight: 400; line-height: 20px;
+    color: var(--slateTextSubtle); cursor: pointer; white-space: nowrap;
+  }
+  .notif-tab.active { font-weight: 500; color: var(--slateTextBody); border-bottom-color: var(--slateTextBody); }
+  .notif-snooze-banner {
+    display: none; align-items: center; justify-content: space-between; gap: 12px; width: 100%; flex-shrink: 0;
+    background: rgba(230, 239, 253, 0.5); border: 0.5px solid var(--blueBorderLight); border-radius: 8px; padding: 12px;
+  }
+  .notif-snooze-banner.show { display: flex; }
+  .notif-snooze-banner p { flex: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 20px; color: var(--pastelLightBlueTextBody, #255c87); }
+  .notif-snooze-resume {
+    border: none; background: none; padding: 4px 12px; font-family: var(--font-family); font-size: 14px; font-weight: 500;
+    color: var(--pastelLightBlueTextBody, #255c87); cursor: pointer; flex-shrink: 0;
+  }
+  .notif-panel.visible.show { transform: translateX(0); opacity: 1; }
+  .notif-panel-header-row { display: flex; align-items: center; justify-content: space-between; width: 100%; flex-shrink: 0; }
+  .notif-panel-header-row h2 { font-size: 18px; font-weight: 500; line-height: 28px; color: var(--slateTextTitle); margin: 0; }
+  .notif-panel-controls { display: flex; align-items: center; gap: 16px; }
+  .notif-unread-toggle { display: flex; align-items: center; gap: 6px; }
+  .notif-unread-toggle span { font-size: 14px; line-height: 20px; color: var(--slateTextBody); }
+  .notif-panel-divider-v { width: 1px; align-self: stretch; background: var(--slateBorderLight); }
+  .notif-panel-icons { display: flex; align-items: center; gap: 18px; }
+  .notif-icon-btn {
+    border: none; background: none; padding: 0; cursor: pointer; width: 16px; height: 16px;
+    color: var(--slateTextSubtle); display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .notif-icon-btn:hover { color: var(--slateTextBody); }
+  .notif-icon-btn svg { width: 16px; height: 16px; }
+  .notif-icon-btn .tooltip {
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background-color: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 400; white-space: nowrap;
+    opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s;
+    pointer-events: none; z-index: 1001;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  .notif-icon-btn:hover .tooltip { opacity: 1; visibility: visible; }
+  .notif-panel-hr { height: 1px; width: 100%; background: var(--slateBorderLight); flex-shrink: 0; }
+  .notif-panel-body {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column; width: 100%; gap: 20px;
+    margin-top: -20px; padding-right: 6px; margin-right: -6px;
+    scrollbar-gutter: stable;
+  }
+  .notif-panel-body-spacer { flex-shrink: 0; height: 12px; }
+  .notif-panel-body::-webkit-scrollbar { width: 6px; }
+  .notif-panel-body::-webkit-scrollbar-track { background: transparent; }
+  .notif-panel-body::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+  .notif-panel-body.scrolling::-webkit-scrollbar-thumb { background: var(--slateBorderLight); }
+  .notif-panel-body { scrollbar-width: none; }
+  .notif-panel-body.scrolling { scrollbar-width: thin; }
+  .notif-day-group { display: flex; flex-direction: column; width: 100%; }
+  .notif-day-label { margin: 0; padding: 8px; font-size: 14px; font-weight: 500; line-height: 20px; color: var(--slateTextSubtle); text-transform: uppercase; position: sticky; top: 0; background: var(--slateSurfaceWhite); z-index: 1; }
+  .notif-rows { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .notif-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px; border-radius: 6px; cursor: pointer; }
+  .notif-row:hover { background: var(--slateSurfaceSubtle); }
+  .notif-row-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; color: var(--slateIconsActive); }
+  .notif-row.read .notif-row-icon { color: var(--slateIconsDisabled); }
+  .notif-row-content { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 10px; }
+  .notif-row-label { flex: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; color: var(--slateTextBody); }
+  .notif-row.read .notif-row-label { font-weight: 400; color: var(--slateTextSubtle); }
+  .notif-row-meta { display: flex; align-items: center; gap: 4px; flex-shrink: 0; height: 20px; align-self: center; position: relative; }
+  .notif-row-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primarySurfaceDefault); flex-shrink: 0; }
+  .notif-row-time { font-size: 12px; line-height: 18px; color: var(--slateTextSubtle); white-space: nowrap; }
+  .notif-row-check {
+    border: none; background: none; padding: 0; cursor: pointer; width: 16px; height: 16px;
+    color: var(--slateTextSubtle); display: none; align-items: center; justify-content: center;
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  }
+  .notif-row:hover .notif-row-check { display: flex; }
+  .notif-row:hover:has(.notif-row-check) .notif-row-dot,
+  .notif-row:hover:has(.notif-row-check) .notif-row-time { opacity: 0; visibility: hidden; }
+  .notif-row-check:hover { color: var(--slateTextBody); }
+  .notif-row-check svg { width: 14px; height: 14px; }
+  .notif-row-check .tooltip {
+    position: absolute; bottom: calc(100% + 8px); right: 0; left: auto; transform: none;
+    background-color: #334155; color: #ffffff; padding: 6px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 400; white-space: nowrap;
+    opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s;
+    pointer-events: none; z-index: 1001;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  .notif-row-check:hover .tooltip { opacity: 1; visibility: visible; }
 </style>
 </head>
 <body>
@@ -951,9 +1051,9 @@
           <img src="/src/assets/icons/inboxes.svg" alt="Inboxes" />
           <span class="tooltip">Conversations</span>
         </div>
-        <div class="mini-item notification-wrapper">
+        <div class="mini-item notification-wrapper" id="notifBellBtn">
           <img src="/src/assets/icons/notification.svg" alt="Notifications" />
-          <div class="notification-dot"></div>
+          <div class="notification-dot" id="notifBellDot"></div>
           <span class="tooltip">Notifications</span>
         </div>
         <div class="mini-item">
@@ -1133,6 +1233,46 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="notif-panel-overlay" id="notifPanelOverlay"></div>
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header-row">
+    <h2>Notifications</h2>
+    <div class="notif-panel-controls">
+      <div class="notif-unread-toggle">
+        <span>Unread</span>
+        <button class="notify-switch" id="notifUnreadSwitch" role="switch" aria-checked="false"><span class="notify-switch-handle"></span></button>
+      </div>
+      <div class="notif-panel-divider-v"></div>
+      <div class="notif-panel-icons">
+        <button class="notif-icon-btn" id="notifMarkAllReadBtn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.66667 8L8 11.3333L14.6667 4.66667M1.33333 8L4.66667 11.3333M8 8L11.3333 4.66667"></path></svg>
+          <span class="tooltip">Mark all as read</span>
+        </button>
+        <button class="notif-icon-btn" id="notifSnoozeBtn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 11.3333H14.3333L11 14.6667H14.3333M14.6338 8.66667C14.6555 8.4474 14.6667 8.225 14.6667 8C14.6667 4.3181 11.6819 1.33333 8 1.33333C4.3181 1.33333 1.33333 4.3181 1.33333 8C1.33333 11.6819 4.3181 14.6667 8 14.6667C8.11178 14.6667 8.22291 14.6639 8.33333 14.6585C8.44519 14.653 8.55632 14.6447 8.66667 14.6337M8 4V8L10.4922 9.24612"></path></svg>
+          <span class="tooltip">Snooze notifications</span>
+          <div class="chan-menu" id="notifSnoozeMenu"></div>
+        </button>
+        <button class="notif-icon-btn" id="notifSettingsBtn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8.00033 10C9.10487 10 10.0003 9.1046 10.0003 8C10.0003 6.8954 9.10487 6 8.00033 6C6.89573 6 6.00033 6.8954 6.00033 8C6.00033 9.1046 6.89573 10 8.00033 10Z"></path><path d="M6.19305 12.9141L6.58268 13.7904C6.69853 14.0512 6.88753 14.2729 7.1268 14.4284C7.36613 14.5839 7.6454 14.6667 7.9308 14.6667C8.21627 14.6667 8.49553 14.5839 8.7348 14.4284C8.97413 14.2729 9.16313 14.0512 9.279 13.7904L9.6686 12.9141C9.80733 12.6031 10.0406 12.3439 10.3353 12.1733C10.6318 12.0023 10.9748 11.9294 11.3153 11.9652L12.2686 12.0667C12.5524 12.0967 12.8388 12.0437 13.0931 11.9142C13.3473 11.7847 13.5586 11.5842 13.7012 11.3371C13.844 11.09 13.912 10.8069 13.897 10.5219C13.882 10.237 13.7847 9.96253 13.6167 9.73187L13.0523 8.95627C12.8513 8.67807 12.7439 8.3432 12.7457 8C12.7456 7.65773 12.854 7.32427 13.0553 7.0474L13.6197 6.27185C13.7876 6.04117 13.885 5.76671 13.9 5.48178C13.915 5.19685 13.8469 4.91369 13.7041 4.66667C13.5615 4.41949 13.3503 4.21899 13.096 4.08949C12.8417 3.95998 12.5553 3.90702 12.2716 3.93704L11.3183 4.03852C10.9778 4.07427 10.6347 4.00141 10.3383 3.83037C10.043 3.65883 9.8096 3.39824 9.6716 3.08593L9.279 2.20963C9.16313 1.94878 8.97413 1.72715 8.7348 1.5716C8.49553 1.41605 8.21627 1.33329 7.9308 1.33333C7.6454 1.33329 7.36613 1.41605 7.1268 1.5716C6.88753 1.72715 6.69853 1.94878 6.58268 2.20963L6.19305 3.08593C6.055 3.39824 5.82163 3.65883 5.52638 3.83037C5.22986 4.00141 4.88683 4.07427 4.54638 4.03852L3.59009 3.93704C3.30631 3.90702 3.01991 3.95998 2.76563 4.08949C2.51135 4.21899 2.30009 4.41949 2.15749 4.66667C2.01471 4.91369 1.94668 5.19685 1.96167 5.48178C1.97666 5.76671 2.07402 6.04117 2.24194 6.27185L2.80638 7.0474C3.00767 7.32427 3.11607 7.65773 3.11601 8C3.11607 8.34227 3.00767 8.6758 2.80638 8.9526L2.24194 9.72813C2.07402 9.9588 1.97666 10.2333 1.96167 10.5182C1.94668 10.8031 2.01471 11.0863 2.15749 11.3333C2.30024 11.5804 2.51151 11.7808 2.76576 11.9103C3.02001 12.0397 3.30633 12.0928 3.59009 12.0629L4.54342 11.9615C4.88387 11.9257 5.22689 11.9986 5.52342 12.1696C5.81977 12.3407 6.05423 12.6013 6.19305 12.9141Z"></path></svg>
+          <span class="tooltip">Notification settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="notif-tabs" id="notifTabs">
+    <button class="notif-tab active" type="button" data-tab="all">All</button>
+    <button class="notif-tab" type="button" data-tab="mentions">Mentions</button>
+    <button class="notif-tab" type="button" data-tab="assigned">Assigned</button>
+    <button class="notif-tab" type="button" data-tab="sla">SLA</button>
+  </div>
+  <div class="notif-snooze-banner" id="notifSnoozeBanner">
+    <p>Notifications snoozed until <strong id="notifSnoozeUntilText"></strong></p>
+    <button class="notif-snooze-resume" id="notifResumeBtn">Resume now</button>
+  </div>
+  <div class="notif-panel-body" id="notifPanelBody"></div>
 </div>
 
 <script>
@@ -1908,6 +2048,264 @@ function renderActiveChannelsDropdown() {
   wrap.appendChild(trigger); wrap.appendChild(menu);
   slot.appendChild(wrap);
 }
+
+// ---- Notification panel (bell icon flyout) ----
+const NOTIF_ICONS = {
+  whatsapp: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.16435 6.76746C6.16435 6.8485 6.19654 6.92622 6.25384 6.98352C6.31115 7.04083 6.38887 7.07302 6.46991 7.07302C6.55094 7.07302 6.62866 7.04083 6.68597 6.98352C6.74327 6.92622 6.77546 6.8485 6.77546 6.76746V6.15635C6.77546 6.07531 6.74327 5.99759 6.68597 5.94029C6.62866 5.88299 6.55094 5.8508 6.46991 5.8508C6.38887 5.8508 6.31115 5.88299 6.25384 5.94029C6.19654 5.99759 6.16435 6.07531 6.16435 6.15635V6.76746ZM6.16435 6.76746C6.16435 7.57785 6.48627 8.35504 7.0593 8.92806C7.63233 9.50109 8.40952 9.82302 9.2199 9.82302M9.2199 9.82302H9.83101C9.91205 9.82302 9.98977 9.79082 10.0471 9.73352C10.1044 9.67622 10.1366 9.5985 10.1366 9.51746C10.1366 9.43642 10.1044 9.3587 10.0471 9.3014C9.98977 9.2441 9.91205 9.2119 9.83101 9.2119H9.2199C9.13887 9.2119 9.06115 9.2441 9.00384 9.3014C8.94654 9.3587 8.91435 9.43642 8.91435 9.51746C8.91435 9.5985 8.94654 9.67622 9.00384 9.73352C9.06115 9.79082 9.13887 9.82302 9.2199 9.82302ZM2.49769 13.4897L3.50602 11.1675C2.73459 10.0724 2.38932 8.73343 2.53499 7.40186C2.68067 6.07029 3.30728 4.83766 4.29723 3.93528C5.28718 3.0329 6.57242 2.52282 7.91175 2.50075C9.25108 2.47868 10.5524 2.94614 11.5716 3.81541C12.5907 4.68468 13.2576 5.896 13.4471 7.22205C13.6365 8.54809 13.3356 9.8977 12.6006 11.0176C11.8657 12.1375 10.7473 12.9507 9.45542 13.3046C8.1635 13.6585 6.78684 13.5287 5.58379 12.9397L2.49769 13.4897Z"></path></svg>',
+  slack: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8.25 8.25V3.75M8.25 8.25H12.75M8.25 8.25V12.75M8.25 8.25H3.75M8.25 3.75C8.25 3.35218 8.40804 2.97064 8.68934 2.68934C8.97065 2.40804 9.35218 2.25 9.75 2.25C10.1478 2.25 10.5294 2.40804 10.8107 2.68934C11.092 2.97064 11.25 3.35218 11.25 3.75V8.25M8.25 3.75C8.25 3.45333 8.16203 3.16332 7.99721 2.91665C7.83238 2.66997 7.59812 2.47771 7.32403 2.36418C7.04994 2.25065 6.74834 2.22094 6.45737 2.27882C6.16639 2.3367 5.89912 2.47956 5.68934 2.68934C5.47956 2.89912 5.3367 3.16639 5.27882 3.45737C5.22095 3.74834 5.25065 4.04994 5.36418 4.32403C5.47771 4.59812 5.66997 4.83238 5.91665 4.9972C6.16332 5.16203 6.45333 5.25 6.75 5.25M11.25 6.75C11.25 6.45333 11.338 6.16332 11.5028 5.91664C11.6676 5.66997 11.9019 5.47771 12.176 5.36418C12.4501 5.25065 12.7517 5.22094 13.0426 5.27882C13.3336 5.3367 13.6009 5.47956 13.8107 5.68934C14.0204 5.89912 14.1633 6.16639 14.2212 6.45736C14.2791 6.74834 14.2494 7.04994 14.1358 7.32402C14.0223 7.59811 13.83 7.83238 13.5834 7.9972C13.3367 8.16203 13.0467 8.25 12.75 8.25M12.75 8.25C13.1478 8.25 13.5294 8.40804 13.8107 8.68934C14.092 8.97064 14.25 9.35217 14.25 9.75C14.25 10.1478 14.092 10.5294 13.8107 10.8107C13.5294 11.092 13.1478 11.25 12.75 11.25H8.25M9.75 11.25C10.0467 11.25 10.3367 11.338 10.5834 11.5028C10.83 11.6676 11.0223 11.9019 11.1358 12.176C11.2494 12.4501 11.2791 12.7517 11.2212 13.0426C11.1633 13.3336 11.0204 13.6009 10.8107 13.8107C10.6009 14.0204 10.3336 14.1633 10.0426 14.2212C9.75167 14.2791 9.45007 14.2493 9.17598 14.1358C8.90189 14.0223 8.66762 13.83 8.5028 13.5834C8.33797 13.3367 8.25 13.0467 8.25 12.75M8.25 12.75C8.25 13.1478 8.09196 13.5294 7.81066 13.8107C7.52936 14.092 7.14783 14.25 6.75 14.25C6.35218 14.25 5.97065 14.092 5.68934 13.8107C5.40804 13.5294 5.25 13.1478 5.25 12.75V8.25M5.25 9.75C5.25 10.0467 5.16203 10.3367 4.9972 10.5834C4.83238 10.83 4.59812 11.0223 4.32403 11.1358C4.04994 11.2494 3.74834 11.2791 3.45737 11.2212C3.16639 11.1633 2.89912 11.0204 2.68934 10.8107C2.47956 10.6009 2.3367 10.3336 2.27882 10.0426C2.22094 9.75166 2.25065 9.45006 2.36418 9.17597C2.47771 8.90189 2.66997 8.66762 2.91665 8.5028C3.16332 8.33797 3.45333 8.25 3.75 8.25M3.75 8.25C3.35218 8.25 2.97065 8.09196 2.68934 7.81066C2.40804 7.52936 2.25 7.14783 2.25 6.75C2.25 6.35218 2.40804 5.97065 2.68934 5.68934C2.97065 5.40804 3.35218 5.25 3.75 5.25H8.25"></path></svg>',
+  chat: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 9.8L4.95484 11.6682C4.69747 11.9288 4.56879 12.0591 4.45817 12.0683C4.36221 12.0763 4.26825 12.0377 4.20558 11.9646C4.13334 11.8803 4.13334 11.6972 4.13334 11.3309V10.395C4.13334 10.0664 3.86424 9.82862 3.53912 9.78098C2.75224 9.66572 2.13427 9.04778 2.01901 8.26088C2 8.13116 2 7.9763 2 7.66664V4.88C2 3.8719 2 3.36786 2.19619 2.98282C2.36876 2.64412 2.64412 2.36876 2.98282 2.19619C3.36786 2 3.8719 2 4.88 2H9.32C10.3281 2 10.8321 2 11.2172 2.19619C11.5559 2.36876 11.8312 2.64412 12.0038 2.98282C12.2 3.36786 12.2 3.8719 12.2 4.88V7.4M12.2 14L10.8942 13.0921C10.7106 12.9645 10.6188 12.9007 10.5189 12.8554C10.4302 12.8153 10.3371 12.7861 10.2414 12.7684C10.1335 12.7486 10.0217 12.7486 9.79814 12.7486H8.72C8.04794 12.7486 7.71188 12.7486 7.4552 12.6178C7.22942 12.5028 7.04582 12.3192 6.9308 12.0934C6.8 11.8366 6.8 11.5006 6.8 10.8286V9.32C6.8 8.64794 6.8 8.31188 6.9308 8.0552C7.04582 7.82942 7.22942 7.64582 7.4552 7.5308C7.71188 7.4 8.04794 7.4 8.72 7.4H12.08C12.7521 7.4 13.0881 7.4 13.3448 7.5308C13.5706 7.64582 13.7542 7.82942 13.8692 8.0552C14 8.31188 14 8.64794 14 9.32V10.9486C14 11.5077 14 11.7873 13.9087 12.0078C13.7869 12.3018 13.5532 12.5355 13.2592 12.6572C13.0387 12.7486 12.7591 12.7486 12.2 12.7486V14Z"></path></svg>',
+  email: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.76429 5.73497L6.66795 6.86046C7.77777 7.51665 8.22139 7.51665 9.33123 6.86046L11.2349 5.73497M1.53952 8.95479C1.58182 10.9384 1.60297 11.9301 2.33488 12.6649C3.06678 13.3996 4.08541 13.4251 6.12267 13.4763C7.37827 13.5079 8.62152 13.5079 9.87714 13.4763C11.9144 13.4251 12.933 13.3996 13.665 12.6649C14.3969 11.9301 14.418 10.9384 14.4603 8.95479C14.4739 8.31698 14.4739 7.68299 14.4603 7.04519C14.418 5.06161 14.3969 4.06982 13.665 3.33513C12.933 2.60044 11.9144 2.57486 9.87714 2.52367C8.62152 2.49211 7.37827 2.49211 6.12266 2.52366C4.08541 2.57484 3.06678 2.60043 2.33487 3.33513C1.60297 4.06981 1.58182 5.0616 1.53951 7.04519C1.52591 7.68299 1.52592 8.31698 1.53952 8.95479Z"></path></svg>',
+};
+
+const NOTIFICATIONS = [
+  {
+    day: 'Today',
+    items: [
+      { id: 'n1', type: 'whatsapp', category: 'message', label: "New WhatsApp message from Priya Sharma: “Is my order still on the way?”", time: '10:42 AM', unread: true },
+      { id: 'n2', type: 'chat', category: 'assigned', label: 'Rahul Verma assigned you a conversation from Jane Cooper', time: '10:30 AM', unread: true },
+      { id: 'n3', type: 'chat', category: 'sla', label: 'First-response SLA is about to breach on ticket #2291', time: '10:18 AM', unread: true },
+      { id: 'n4', type: 'chat', category: 'mentions', label: 'Ana Souza mentioned you in a note on ticket #2287', time: '09:55 AM', unread: true },
+      { id: 'n5', type: 'slack', category: 'message', label: 'New Slack message in #support-escalations: “Can someone take ticket #2291?”', time: '09:40 AM', unread: false },
+      { id: 'n6', type: 'email', category: 'message', label: 'New email from billing@acme.com: “Invoice #4482 is now overdue”', time: '09:10 AM', unread: false },
+      { id: 'n7', type: 'chat', category: 'assigned', label: "Automation ‘Auto-close idle tickets’ skipped ticket #2265 because assignee(s) are Out of Office", time: '08:45 AM', unread: false },
+    ],
+  },
+  {
+    day: 'Yesterday',
+    items: [
+      { id: 'n8', type: 'whatsapp', category: 'message', label: "New WhatsApp message from Michael Chen: “Can you resend the invoice?”", time: '05:12 PM', unread: true },
+      { id: 'n9', type: 'chat', category: 'assigned', label: 'You were auto-assigned a chat from Sarah Kim', time: '03:47 PM', unread: true },
+      { id: 'n10', type: 'chat', category: 'sla', label: 'Next-response SLA breached on ticket #2244', time: '02:20 PM', unread: false },
+      { id: 'n11', type: 'chat', category: 'mentions', label: 'Devika Nair mentioned you in a note on ticket #2231', time: '01:05 PM', unread: false },
+      { id: 'n12', type: 'email', category: 'message', label: 'New email from support@globex.com: “Re: Order #8823 shipping delay”', time: '11:30 AM', unread: false },
+      { id: 'n13', type: 'chat', category: 'assigned', label: 'Ticket #2218 was marked as resolved by Arjun Mehta', time: '10:05 AM', unread: false },
+      { id: 'n14', type: 'slack', category: 'message', label: 'New Slack message in #eng-oncall: “Can you check the webhook failure?”', time: '09:15 AM', unread: false },
+    ],
+  },
+  {
+    day: (() => {
+      const d = new Date();
+      d.setDate(d.getDate() - 2);
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    })(),
+    items: [
+      { id: 'n15', type: 'whatsapp', category: 'message', label: "New WhatsApp message from Elena Gomez: “Do you ship internationally?”", time: '06:48 PM', unread: false },
+      { id: 'n16', type: 'chat', category: 'assigned', label: 'You were auto-assigned a chat from Omar Farouk', time: '04:22 PM', unread: false },
+      { id: 'n17', type: 'chat', category: 'sla', label: 'Resolution SLA breached on ticket #2176', time: '02:50 PM', unread: false },
+      { id: 'n18', type: 'chat', category: 'mentions', label: 'Neha Kapoor mentioned you in a note on ticket #2160', time: '01:35 PM', unread: false },
+      { id: 'n19', type: 'email', category: 'message', label: 'New email from noreply@stripe.com: “Your invoice payment failed”', time: '11:58 AM', unread: false },
+      { id: 'n20', type: 'slack', category: 'message', label: 'New Slack message in #general: “Reminder: standup moved to 10 AM”', time: '10:20 AM', unread: false },
+    ],
+  },
+];
+
+const notifState = { unreadOnly: false, activeTab: 'all' };
+
+function hasUnreadNotifications() {
+  return NOTIFICATIONS.some(group => group.items.some(item => item.unread));
+}
+
+function updateNotifBellDot() {
+  const dot = document.getElementById('notifBellDot');
+  if (dot) dot.style.display = hasUnreadNotifications() ? 'block' : 'none';
+}
+
+function renderNotifPanel() {
+  const body = document.getElementById('notifPanelBody');
+  body.innerHTML = '';
+  const spacer = document.createElement('div');
+  spacer.className = 'notif-panel-body-spacer';
+  body.appendChild(spacer);
+  NOTIFICATIONS.forEach(group => {
+    let items = notifState.unreadOnly ? group.items.filter(i => i.unread) : group.items;
+    if (notifState.activeTab !== 'all') items = items.filter(i => i.category === notifState.activeTab);
+    if (!items.length) return;
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'notif-day-group';
+
+    const label = document.createElement('p');
+    label.className = 'notif-day-label';
+    label.textContent = group.day;
+    groupEl.appendChild(label);
+
+    const rows = document.createElement('div');
+    rows.className = 'notif-rows';
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = `notif-row ${item.unread ? '' : 'read'}`;
+
+      const icon = document.createElement('span');
+      icon.className = 'notif-row-icon';
+      icon.innerHTML = NOTIF_ICONS[item.type] || '';
+      row.appendChild(icon);
+
+      const content = document.createElement('div');
+      content.className = 'notif-row-content';
+
+      const text = document.createElement('p');
+      text.className = 'notif-row-label';
+      text.textContent = item.label;
+      content.appendChild(text);
+
+      const meta = document.createElement('div');
+      meta.className = 'notif-row-meta';
+      if (item.unread) {
+        const dot = document.createElement('span');
+        dot.className = 'notif-row-dot';
+        meta.appendChild(dot);
+      }
+      const time = document.createElement('span');
+      time.className = 'notif-row-time';
+      time.textContent = item.time;
+      meta.appendChild(time);
+      if (item.unread) {
+        const check = document.createElement('button');
+        check.className = 'notif-row-check';
+        check.type = 'button';
+        check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg><span class="tooltip">Mark as read</span>';
+        check.addEventListener('click', (e) => {
+          e.stopPropagation();
+          item.unread = false;
+          renderNotifPanel();
+          updateNotifBellDot();
+        });
+        meta.appendChild(check);
+      }
+      content.appendChild(meta);
+
+      row.appendChild(content);
+      row.addEventListener('click', () => {
+        item.unread = false;
+        renderNotifPanel();
+        updateNotifBellDot();
+      });
+      rows.appendChild(row);
+    });
+    groupEl.appendChild(rows);
+    body.appendChild(groupEl);
+  });
+}
+
+let notifPanelCloseTimer = null;
+function openNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  clearTimeout(notifPanelCloseTimer);
+  panel.classList.add('visible');
+  document.getElementById('notifPanelOverlay').classList.add('show');
+  // Force a reflow so the visible->show transition actually animates instead of
+  // jumping straight to the end state (display:none can't be transitioned).
+  void panel.offsetWidth;
+  requestAnimationFrame(() => panel.classList.add('show'));
+}
+function closeNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  panel.classList.remove('show');
+  document.getElementById('notifPanelOverlay').classList.remove('show');
+  clearTimeout(notifPanelCloseTimer);
+  notifPanelCloseTimer = setTimeout(() => panel.classList.remove('visible'), 150);
+}
+
+const notifBellBtn = document.getElementById('notifBellBtn');
+if (notifBellBtn) {
+  notifBellBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = document.getElementById('notifPanel').classList.contains('show');
+    if (isOpen) closeNotifPanel(); else openNotifPanel();
+  });
+}
+document.getElementById('notifPanelOverlay').addEventListener('click', closeNotifPanel);
+document.getElementById('notifPanel').addEventListener('click', (e) => e.stopPropagation());
+
+// ---- Snooze notifications (mirrors the notification-settings snooze flow) ----
+const NOTIF_SNOOZE_OPTIONS = [
+  { id: '30m', label: 'For 30 minutes', ms: 30 * 60 * 1000 },
+  { id: '1h', label: 'For 1 hour', ms: 60 * 60 * 1000 },
+  { id: '2h', label: 'For 2 hours', ms: 120 * 60 * 1000 },
+];
+let notifSnoozeUntil = null;
+
+function renderNotifSnoozeMenu() {
+  const menu = document.getElementById('notifSnoozeMenu');
+  menu.innerHTML = '';
+  NOTIF_SNOOZE_OPTIONS.forEach(opt => {
+    const item = document.createElement('div');
+    item.className = 'chan-option';
+    item.style.cursor = 'pointer';
+    item.innerHTML = `<span>${opt.label}</span>`;
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notifSnoozeUntil = new Date(Date.now() + opt.ms);
+      updateNotifSnoozeUI();
+      closeAllChanMenus();
+    });
+    menu.appendChild(item);
+  });
+}
+renderNotifSnoozeMenu();
+
+function updateNotifSnoozeUI() {
+  const banner = document.getElementById('notifSnoozeBanner');
+  if (notifSnoozeUntil) {
+    banner.classList.add('show');
+    document.getElementById('notifSnoozeUntilText').textContent =
+      notifSnoozeUntil.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase();
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+document.getElementById('notifSnoozeBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('notifSnoozeMenu');
+  const isOpen = menu.classList.contains('open');
+  closeAllChanMenus();
+  if (!isOpen) menu.classList.add('open');
+});
+document.getElementById('notifResumeBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  notifSnoozeUntil = null;
+  updateNotifSnoozeUI();
+});
+
+document.querySelectorAll('.notif-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    notifState.activeTab = tab.dataset.tab;
+    renderNotifPanel();
+  });
+});
+
+const notifUnreadSwitch = document.getElementById('notifUnreadSwitch');
+notifUnreadSwitch.addEventListener('click', () => {
+  notifState.unreadOnly = !notifState.unreadOnly;
+  notifUnreadSwitch.classList.toggle('on', notifState.unreadOnly);
+  notifUnreadSwitch.setAttribute('aria-checked', notifState.unreadOnly);
+  renderNotifPanel();
+});
+
+document.getElementById('notifMarkAllReadBtn').addEventListener('click', () => {
+  NOTIFICATIONS.forEach(group => group.items.forEach(item => {
+    if (notifState.activeTab === 'all' || item.category === notifState.activeTab) item.unread = false;
+  }));
+  renderNotifPanel();
+  updateNotifBellDot();
+});
+
+document.getElementById('notifSettingsBtn').addEventListener('click', () => {
+  closeNotifPanel();
+});
+
+renderNotifPanel();
+updateNotifBellDot();
+
+let notifBodyScrollTimer = null;
+document.getElementById('notifPanelBody').addEventListener('scroll', (e) => {
+  e.target.classList.add('scrolling');
+  clearTimeout(notifBodyScrollTimer);
+  notifBodyScrollTimer = setTimeout(() => e.target.classList.remove('scrolling'), 600);
+});
 
 // ---- Initialize ----
 renderBucketsCard();
