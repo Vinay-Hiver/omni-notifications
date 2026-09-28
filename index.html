@@ -1050,7 +1050,7 @@
           </div>
 
           <div class="notify-snooze-banner" id="snoozeBanner">
-            <p>Notifications paused until <strong id="snoozeUntilText"></strong></p>
+            <p>Notifications snoozed until <strong id="snoozeUntilText"></strong></p>
             <button class="notify-snooze-resume" id="resumeBtn">Resume now</button>
           </div>
 
@@ -1452,8 +1452,8 @@ function renderSnoozeDropdown() {
   trigger.type = 'button';
   trigger.className = 'tone-dropdown-trigger snooze-trigger';
   trigger.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 15V9m5 6V9m7.5 3c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10Z"></path></svg>
-      <span>Pause notifications</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 17h5l-5 5h5m.45-9c.033-.329.05-.662.05-1 0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10a10.11 10.11 0 0 0 1-.05M12 6v6l3.738 1.87"></path></svg>
+      <span>Snooze notifications</span>
     </span>`;
 
   const menu = document.createElement('div');
